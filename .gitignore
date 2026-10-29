@@ -15,6 +15,7 @@ backend/.mvn/wrapper/maven-wrapper.jar
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+*.tsbuildinfo
 
 # ── IDEs ─────────────────────────────────────────
 .idea/
