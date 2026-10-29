@@ -2,24 +2,24 @@ services:
 
   postgres:
     image: postgres:16-alpine
-    container_name: pingnpay-db
+    container_name: paydar-db
     environment:
-      POSTGRES_DB: pingnpay
-      POSTGRES_USER: pingnpay
-      POSTGRES_PASSWORD: pingnpay
+      POSTGRES_DB: paydar
+      POSTGRES_USER: paydar
+      POSTGRES_PASSWORD: paydar
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pingnpay"]
+      test: ["CMD-SHELL", "pg_isready -U paydar"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: pingnpay-redis
+    container_name: paydar-redis
     ports:
       - "6379:6379"
     volumes:
