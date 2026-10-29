@@ -11,11 +11,11 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.pingnpay</groupId>
-    <artifactId>ping-n-pay-backend</artifactId>
+    <groupId>com.paydar</groupId>
+    <artifactId>paydar-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ping-n-pay-backend</name>
-    <description>Ping n Pay — Invoice &amp; Overdue Payment Notification System</description>
+    <name>paydar-backend</name>
+    <description>Paydar — Invoice &amp; Overdue Payment Notification System</description>
 
     <properties>
         <java.version>21</java.version>
