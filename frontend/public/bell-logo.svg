@@ -1,26 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 20 340 340" role="img" aria-label="Ping 'n Pay bell">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 20 340 340" role="img" aria-label="Paydar bell">
   <!-- sound waves -->
-  <g fill="none" stroke="#912F40" stroke-width="16" stroke-linecap="round">
+  <g fill="none" stroke="#B80047" stroke-width="16" stroke-linecap="round">
     <path d="M149.7 99.2 A125 125 0 0 1 310.3 99.2" />
     <path d="M130.4 76.3 A155 155 0 0 1 329.6 76.3" />
   </g>
 
   <!-- wire + switch -->
-  <path d="M168 318 Q132 322 128 290" fill="none" stroke="#080705" stroke-width="7" stroke-linecap="round" />
-  <rect x="116" y="262" width="24" height="30" rx="5" fill="#912F40" stroke="#080705" stroke-width="6" />
+  <path d="M168 318 Q132 322 128 290" fill="none" stroke="#001A3D" stroke-width="7" stroke-linecap="round" />
+  <rect x="116" y="262" width="24" height="30" rx="5" fill="#B80047" stroke="#001A3D" stroke-width="6" />
 
   <!-- base -->
   <path d="M168 298 Q168 284 182 284 H278 Q292 284 292 298 L298 338 Q300 350 286 350 H174 Q160 350 162 338 Z"
-        fill="#40434E" stroke="#080705" stroke-width="10" stroke-linejoin="round" />
-  <path d="M176 300 H284" stroke="#5E6170" stroke-width="6" stroke-linecap="round" />
+        fill="#002D62" stroke="#001A3D" stroke-width="10" stroke-linejoin="round" />
+  <path d="M176 300 H284" stroke="#2F5A8F" stroke-width="6" stroke-linecap="round" />
 
   <!-- bell dome -->
   <clipPath id="dome"><circle cx="230" cy="195" r="102" /></clipPath>
-  <circle cx="230" cy="195" r="102" fill="#702632" />
-  <circle cx="218" cy="185" r="100" fill="#912F40" clip-path="url(#dome)" />
-  <circle cx="230" cy="195" r="102" fill="none" stroke="#080705" stroke-width="11" />
-  <path d="M166 150 A78 78 0 0 1 222 118" fill="none" stroke="#C9707F" stroke-width="12" stroke-linecap="round" />
+  <circle cx="230" cy="195" r="102" fill="#8A0035" />
+  <circle cx="218" cy="185" r="100" fill="#B80047" clip-path="url(#dome)" />
+  <circle cx="230" cy="195" r="102" fill="none" stroke="#001A3D" stroke-width="11" />
+  <path d="M166 150 A78 78 0 0 1 222 118" fill="none" stroke="#E8558F" stroke-width="12" stroke-linecap="round" />
 
   <!-- striker -->
-  <circle cx="230" cy="195" r="23" fill="#FFFFFA" stroke="#080705" stroke-width="9" />
+  <circle cx="230" cy="195" r="23" fill="#FFFFFF" stroke="#001A3D" stroke-width="9" />
 </svg>

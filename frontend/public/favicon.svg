@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <!-- simplified bell for small sizes: single wave, no wire -->
-  <path d="M15.3 10.1 A26 26 0 0 1 48.7 10.1" fill="none" stroke="#912F40" stroke-width="5" stroke-linecap="round" />
-  <rect x="19" y="45" width="26" height="12" rx="3" fill="#4A4A4A" stroke="#1F1F1F" stroke-width="3.5" />
-  <circle cx="32" cy="30" r="18" fill="#D73A33" stroke="#1F1F1F" stroke-width="4" />
-  <circle cx="32" cy="30" r="5" fill="#F1EBDF" stroke="#1F1F1F" stroke-width="3" />
+  <path d="M15.3 10.1 A26 26 0 0 1 48.7 10.1" fill="none" stroke="#B80047" stroke-width="5" stroke-linecap="round" />
+  <rect x="19" y="45" width="26" height="12" rx="3" fill="#002D62" stroke="#001A3D" stroke-width="3.5" />
+  <circle cx="32" cy="30" r="18" fill="#B80047" stroke="#001A3D" stroke-width="4" />
+  <circle cx="32" cy="30" r="5" fill="#FFFFFF" stroke="#001A3D" stroke-width="3" />
 </svg>

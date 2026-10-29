@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="4 2 92 92" role="img" aria-label="Register">
   <defs>
     <linearGradient id="rose" x1="0" y1="8" x2="0" y2="90" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#C9707F" />
-      <stop offset="0.5" stop-color="#912F40" />
-      <stop offset="1" stop-color="#702632" />
+      <stop offset="0" stop-color="#E8558F" />
+      <stop offset="0.5" stop-color="#B80047" />
+      <stop offset="1" stop-color="#8A0035" />
     </linearGradient>
   </defs>
 

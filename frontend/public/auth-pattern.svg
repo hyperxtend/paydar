@@ -1,8 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400" width="400" height="400">
   <!--
     Seamless finance doodle tile. Every icon sits fully inside the tile so it
-    repeats without seams. Strokes are Porcelain at low opacity, meant to sit on
-    top of the Wine Plum -> Burnt Rose auth gradient.
+    repeats without seams. Each icon gets its own brand color (Lipstick, Dark
+    Blue, Confetti, Rose, Slate Blue), arranged so neighbours never match, even
+    across tile edges. Low opacity so it sits quietly on the auth gradient.
   -->
   <defs>
     <!-- each icon is drawn in a 48x48 box -->
@@ -71,45 +72,46 @@
     </g>
   </defs>
 
-  <g fill="none" stroke="#FFFFFA" stroke-opacity="0.16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Lipstick #B80047 · Dark Blue #002D62 · Confetti #DFE966 · Rose #CC1A5E · Slate Blue #4A5D7A -->
+  <g fill="none" stroke-opacity="0.35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <!-- row 1 -->
-    <use xlink:href="#bag"        transform="translate(14 10) rotate(-8 24 24)" />
-    <use xlink:href="#card"       transform="translate(118 18) rotate(10 24 24)" />
-    <use xlink:href="#calculator" transform="translate(222 8)" />
-    <use xlink:href="#chart"      transform="translate(318 14) rotate(6 24 24)" />
+    <use xlink:href="#bag"        transform="translate(14 10) rotate(-8 24 24)"     stroke="#B80047" />
+    <use xlink:href="#card"       transform="translate(118 18) rotate(10 24 24)"    stroke="#002D62" />
+    <use xlink:href="#calculator" transform="translate(222 8)"                      stroke="#DFE966" />
+    <use xlink:href="#chart"      transform="translate(318 14) rotate(6 24 24)"     stroke="#4A5D7A" />
 
     <!-- row 2 -->
-    <use xlink:href="#pencil"     transform="translate(58 108)" />
-    <use xlink:href="#coins"      transform="translate(160 106)" />
-    <use xlink:href="#check"      transform="translate(258 112) rotate(-10 24 24)" />
-    <use xlink:href="#shield"     transform="translate(336 102)" />
+    <use xlink:href="#pencil"     transform="translate(58 108)"                     stroke="#DFE966" />
+    <use xlink:href="#coins"      transform="translate(160 106)"                    stroke="#4A5D7A" />
+    <use xlink:href="#check"      transform="translate(258 112) rotate(-10 24 24)"  stroke="#B80047" />
+    <use xlink:href="#shield"     transform="translate(336 102)"                    stroke="#002D62" />
 
     <!-- row 3 -->
-    <use xlink:href="#receipt"    transform="translate(10 204) rotate(-10 24 24)" />
-    <use xlink:href="#bank"       transform="translate(104 196) scale(1.2)" />
-    <use xlink:href="#padlock"    transform="translate(228 212) rotate(8 24 24)" />
-    <use xlink:href="#banknote"   transform="translate(312 204) rotate(-12 24 24)" />
+    <use xlink:href="#receipt"    transform="translate(10 204) rotate(-10 24 24)"   stroke="#002D62" />
+    <use xlink:href="#bank"       transform="translate(104 196) scale(1.2)"         stroke="#CC1A5E" />
+    <use xlink:href="#padlock"    transform="translate(228 212) rotate(8 24 24)"    stroke="#4A5D7A" />
+    <use xlink:href="#banknote"   transform="translate(312 204) rotate(-12 24 24)"  stroke="#DFE966" />
 
     <!-- row 4 -->
-    <use xlink:href="#bell"       transform="translate(36 300) rotate(-6 24 24)" />
-    <use xlink:href="#wallet"     transform="translate(138 306) rotate(6 24 24)" />
-    <use xlink:href="#pencil"     transform="translate(236 296) rotate(90 24 24)" />
-    <use xlink:href="#card"       transform="translate(314 316) rotate(-8 24 24)" />
+    <use xlink:href="#bell"       transform="translate(36 300) rotate(-6 24 24)"    stroke="#4A5D7A" />
+    <use xlink:href="#wallet"     transform="translate(138 306) rotate(6 24 24)"    stroke="#DFE966" />
+    <use xlink:href="#pencil"     transform="translate(236 296) rotate(90 24 24)"   stroke="#002D62" />
+    <use xlink:href="#card"       transform="translate(314 316) rotate(-8 24 24)"   stroke="#CC1A5E" />
 
     <!-- filler rings -->
-    <circle cx="104" cy="88" r="4" />
-    <circle cx="300" cy="184" r="4" />
-    <circle cx="200" cy="284" r="4" />
-    <circle cx="24" cy="372" r="4" />
+    <circle cx="104" cy="88" r="4" stroke="#B80047" />
+    <circle cx="300" cy="184" r="4" stroke="#002D62" />
+    <circle cx="200" cy="284" r="4" stroke="#CC1A5E" />
+    <circle cx="24" cy="372" r="4" stroke="#4A5D7A" />
   </g>
 
   <!-- filler dots -->
-  <g fill="#FFFFFA" fill-opacity="0.16">
-    <circle cx="208" cy="92" r="2.5" />
-    <circle cx="90" cy="184" r="2.5" />
-    <circle cx="300" cy="284" r="2.5" />
-    <circle cx="120" cy="380" r="2.5" />
-    <circle cx="380" cy="80" r="2.5" />
-    <circle cx="380" cy="380" r="2.5" />
+  <g fill-opacity="0.35">
+    <circle cx="208" cy="92" r="2.5" fill="#CC1A5E" />
+    <circle cx="90" cy="184" r="2.5" fill="#DFE966" />
+    <circle cx="300" cy="284" r="2.5" fill="#B80047" />
+    <circle cx="120" cy="380" r="2.5" fill="#002D62" />
+    <circle cx="380" cy="80" r="2.5" fill="#4A5D7A" />
+    <circle cx="380" cy="380" r="2.5" fill="#DFE966" />
   </g>
 </svg>
