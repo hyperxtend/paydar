@@ -71,14 +71,14 @@ export default function RegisterForm() {
         component="form"
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}
+        sx={{ mt: 3.5, display: 'flex', flexDirection: 'column', gap: 3 }}
       >
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, rowGap: 3, columnGap: 2 }}>
           <TextField
             label="First name"
             autoComplete="given-name"
             {...field('firstName')}
-            slotProps={startIcon(<PersonOutlinedIcon color="primary" />)}
+            slotProps={startIcon(<PersonOutlinedIcon />)}
           />
           <TextField label="Surname" autoComplete="family-name" {...field('lastName')} />
         </Box>
@@ -88,7 +88,7 @@ export default function RegisterForm() {
           autoComplete="organization"
           placeholder="Acme Ltd"
           {...field('organisationName')}
-          slotProps={startIcon(<BusinessOutlinedIcon color="primary" />)}
+          slotProps={startIcon(<BusinessOutlinedIcon />)}
         />
 
         <TextField
@@ -97,7 +97,7 @@ export default function RegisterForm() {
           autoComplete="email"
           placeholder="you@company.com"
           {...field('email')}
-          slotProps={startIcon(<MailOutlineIcon color="primary" />)}
+          slotProps={startIcon(<MailOutlineIcon />)}
         />
 
         <PasswordField
@@ -113,7 +113,7 @@ export default function RegisterForm() {
           size="large"
           fullWidth
           disabled={isSubmitting}
-          sx={{ mt: 1, py: 1.5, borderRadius: 3, fontSize: '1rem' }}
+          sx={{ mt: 1, py: 1.4, borderRadius: '12px', fontSize: '0.975rem' }}
         >
           {isSubmitting ? 'Creating account…' : 'Create account'}
         </Button>

@@ -15,7 +15,7 @@ export default function PasswordField(props: TextFieldProps) {
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <LockOutlinedIcon color="primary" />
+              <LockOutlinedIcon />
             </InputAdornment>
           ),
           endAdornment: (
@@ -24,7 +24,7 @@ export default function PasswordField(props: TextFieldProps) {
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword((v) => !v)}
                 edge="end"
-                color="primary"
+                sx={{ color: 'inherit' }}
               >
                 {showPassword ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
               </IconButton>

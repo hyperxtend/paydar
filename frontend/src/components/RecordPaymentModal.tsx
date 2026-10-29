@@ -74,7 +74,7 @@ export function RecordPaymentModal({ invoiceId, balanceDue, currency, onClose }:
               type="number"
               step="0.01"
               min="0.01"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full field px-3 py-2 text-sm"
             />
             {errors.amount && <p className="mt-1 text-xs text-red-500">{errors.amount.message}</p>}
           </div>
@@ -84,7 +84,7 @@ export function RecordPaymentModal({ invoiceId, balanceDue, currency, onClose }:
             <label className="block text-sm font-medium text-gray-700 mb-1">Payment method</label>
             <select
               {...register('paymentMethod')}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full field px-3 py-2 text-sm"
             >
               {METHODS.map((m) => (
                 <option key={m} value={m}>{PAYMENT_METHOD_LABELS[m]}</option>
@@ -100,7 +100,7 @@ export function RecordPaymentModal({ invoiceId, balanceDue, currency, onClose }:
             <input
               {...register('reference')}
               placeholder="e.g. bank ref, cheque number"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full field px-3 py-2 text-sm"
             />
           </div>
 
@@ -112,7 +112,7 @@ export function RecordPaymentModal({ invoiceId, balanceDue, currency, onClose }:
             <input
               {...register('paidAt')}
               type="datetime-local"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full field px-3 py-2 text-sm"
             />
           </div>
 
@@ -124,7 +124,7 @@ export function RecordPaymentModal({ invoiceId, balanceDue, currency, onClose }:
             <textarea
               {...register('notes')}
               rows={2}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+              className="w-full field px-3 py-2 text-sm resize-none"
             />
           </div>
 

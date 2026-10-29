@@ -51,7 +51,7 @@ export default function LoginForm() {
         component="form"
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}
+        sx={{ mt: 3.5, display: 'flex', flexDirection: 'column', gap: 3 }}
       >
         <TextField
           id="login-email"
@@ -68,7 +68,7 @@ export default function LoginForm() {
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <MailOutlineIcon color="primary" />
+                  <MailOutlineIcon />
                 </InputAdornment>
               ),
             },
@@ -92,7 +92,7 @@ export default function LoginForm() {
           size="large"
           fullWidth
           disabled={isSubmitting}
-          sx={{ mt: 1, py: 1.5, borderRadius: 3, fontSize: '1rem' }}
+          sx={{ mt: 1, py: 1.4, borderRadius: '12px', fontSize: '0.975rem' }}
         >
           {isSubmitting ? 'Signing in…' : 'Login'}
         </Button>
