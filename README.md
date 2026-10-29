@@ -1,8 +1,8 @@
-# 🔔 Ping 'n Pay
+# 🔔 Paydar
 
 *Send the invoice. Ping the client. Get paid.*
 
-Ping 'n Pay is a full-stack invoicing system with a not-so-secret superpower: it **won't let overdue invoices go quietly into the night**. Create clients, raise invoices, and let the notification engine chase payments over email, SMS, WhatsApp and in-app alerts — so you don't have to.
+Paydar is a full-stack invoicing system with a not-so-secret superpower: it **won't let overdue invoices go quietly into the night**. Create clients, raise invoices, and let the notification engine chase payments over email, SMS, WhatsApp and in-app alerts — so you don't have to.
 
 ---
 
@@ -45,12 +45,12 @@ Ping 'n Pay is a full-stack invoicing system with a not-so-secret superpower: it
 ### 1. Clone and start the datastores
 
 ```bash
-git clone https://github.com/hyperxtend/ping-n-pay.git
-cd ping-n-pay
+git clone https://github.com/hyperxtend/paydar.git
+cd paydar
 docker compose up -d
 ```
 
-This gives you Postgres on `5432` and Redis on `6379`, both with local defaults (`pingnpay` / `pingnpay`).
+This gives you Postgres on `5432` and Redis on `6379`, both with local defaults (`paydar` / `paydar`).
 
 ### 2. Start the backend
 
@@ -140,7 +140,7 @@ All other secrets (`STRIPE_SECRET_KEY`, `TWILIO_*`, etc.) are passed as environm
 
 ```
 backend/
-  src/main/java/com/pingnpay/
+  src/main/java/com/paydar/
     auth/           JWT auth, MFA verify endpoint
     mfa/            TOTP enrolment, verification, backup codes
     domain/         JPA entities — Invoice, Client, Payment, Notification, User

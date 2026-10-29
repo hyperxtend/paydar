@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "5fe250ec-833a-46de-a910-1498f23447ac",
-    "name": "Ping 'n Pay API",
-    "description": "REST API for Ping 'n Pay — invoicing + overdue payment notifications.\n\nRun \"Auth > Login\" (or \"Auth > Register\" first) to populate {{accessToken}} for the rest of the collection automatically. Requests that create resources (Create Client, Create Invoice, Record Payment, Create Notification Rule) auto-populate the corresponding {{...Id}} variable used by later requests in that folder.\n\nIf the logged-in user has MFA enabled, Login instead populates {{mfaPendingToken}} — run Auth > Verify MFA with a TOTP/backup code to complete login and populate {{accessToken}} as normal.\n\nBase URL defaults to the local dev backend (http://localhost:8080/api) per the project README.",
+    "name": "Paydar API",
+    "description": "REST API for Paydar — invoicing + overdue payment notifications.\n\nRun \"Auth > Login\" (or \"Auth > Register\" first) to populate {{accessToken}} for the rest of the collection automatically. Requests that create resources (Create Client, Create Invoice, Record Payment, Create Notification Rule) auto-populate the corresponding {{...Id}} variable used by later requests in that folder.\n\nIf the logged-in user has MFA enabled, Login instead populates {{mfaPendingToken}} — run Auth > Verify MFA with a TOTP/backup code to complete login and populate {{accessToken}} as normal.\n\nBase URL defaults to the local dev backend (http://localhost:8080/api) per the project README.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
