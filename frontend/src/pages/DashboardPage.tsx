@@ -18,17 +18,20 @@ function MetricCard({
   sub?: string
   colour?: 'brand' | 'green' | 'red' | 'yellow' | 'gray'
 }) {
-  const ring: Record<string, string> = {
-    brand:  'border-l-brand-500',
-    green:  'border-l-green-500',
-    red:    'border-l-red-500',
-    yellow: 'border-l-yellow-400',
-    gray:   'border-l-gray-300',
+  const dot: Record<string, string> = {
+    brand:  'bg-brand-600',
+    green:  'bg-green-500',
+    red:    'bg-red-500',
+    yellow: 'bg-yellow-400',
+    gray:   'bg-gray-300',
   }
   return (
-    <div className={`bg-white rounded-xl border border-gray-200 border-l-4 ${ring[colour]} p-5`}>
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{label}</p>
-      <p className="mt-2 text-2xl font-bold text-gray-900 tabular-nums">{value}</p>
+    <div className="card p-5">
+      <p className="flex items-center gap-2 text-[13px] font-medium text-gray-500">
+        <span className={`h-2 w-2 rounded-full ${dot[colour]}`} />
+        {label}
+      </p>
+      <p className="mt-2 text-[28px] leading-tight font-semibold tracking-tight text-gray-900 tabular-nums">{value}</p>
       {sub && <p className="mt-1 text-xs text-gray-500">{sub}</p>}
     </div>
   )
@@ -47,7 +50,7 @@ function StatusBar({ metrics }: { metrics: DashboardMetrics }) {
   ].filter((s) => s.count > 0)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
+    <div className="card p-5">
       <h2 className="text-sm font-semibold text-gray-700 mb-3">Invoice status breakdown</h2>
       <div className="flex rounded-full overflow-hidden h-4">
         {segments.map((s) => (
@@ -83,7 +86,7 @@ function AgingBars({ metrics }: { metrics: DashboardMetrics }) {
   const max = Math.max(...buckets.map((b) => b.value), 1)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
+    <div className="card p-5">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-gray-700">Accounts receivable aging</h2>
         <Link
@@ -131,7 +134,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-[34px] leading-tight font-bold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-500 mt-1">Your organisation at a glance</p>
       </div>
 
@@ -170,7 +173,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 gap-4">
         <Link
           to="/invoices/new"
-          className="flex items-center gap-3 bg-brand-600 text-white rounded-xl p-4 hover:bg-brand-700 transition-colors"
+          className="flex items-center gap-3 bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-2xl p-4 shadow-card hover:brightness-110 transition"
         >
           <svg className="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -182,7 +185,7 @@ export default function DashboardPage() {
         </Link>
         <Link
           to="/notification-rules"
-          className="flex items-center gap-3 bg-white border border-gray-200 text-gray-700 rounded-xl p-4 hover:bg-gray-50 transition-colors"
+          className="card flex items-center gap-3 text-gray-700 p-4 hover:bg-gray-50 transition-colors"
         >
           <svg className="h-6 w-6 flex-shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />

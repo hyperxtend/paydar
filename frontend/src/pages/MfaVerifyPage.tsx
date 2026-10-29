@@ -44,7 +44,7 @@ export default function MfaVerifyPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-sm w-full bg-white rounded-2xl shadow-sm border border-gray-200 p-8 space-y-6">
+      <div className="max-w-sm w-full card p-8 space-y-6">
         {/* Icon */}
         <div className="flex justify-center">
           <div className="h-14 w-14 rounded-full bg-brand-50 flex items-center justify-center">
@@ -78,7 +78,7 @@ export default function MfaVerifyPage() {
             placeholder="000 000"
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\s/g, ''))}
-            className="block w-full px-4 py-3 text-center text-xl font-mono tracking-widest border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="block w-full px-4 py-3 text-center text-xl font-mono tracking-widest field"
           />
 
           <button

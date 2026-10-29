@@ -88,7 +88,7 @@ export default function ReportsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
+          <h1 className="text-[34px] leading-tight font-bold text-gray-900">Reports</h1>
           <p className="text-sm text-gray-500 mt-1">Accounts receivable aging and invoice export</p>
         </div>
         <button
@@ -118,7 +118,7 @@ export default function ReportsPage() {
           </div>
 
           {/* Aging table */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="card overflow-hidden">
             <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-gray-900">Outstanding invoices</h2>
               <span className="text-xs text-gray-500">{aging.rows.length} record{aging.rows.length !== 1 ? 's' : ''}</span>

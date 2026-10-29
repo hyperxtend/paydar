@@ -21,7 +21,7 @@ export default function InvoicesPage() {
     <div className="px-8 py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Invoices</h1>
+          <h1 className="text-[34px] leading-tight font-bold text-gray-900">Invoices</h1>
           <p className="text-sm text-gray-500 mt-0.5">{invoices?.length ?? 0} total</p>
         </div>
         <Link

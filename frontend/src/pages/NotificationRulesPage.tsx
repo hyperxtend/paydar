@@ -77,7 +77,7 @@ function RuleModal({
             <input
               {...register('name')}
               placeholder="e.g. 3-day overdue reminder"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full field px-3 py-2 text-sm"
             />
             {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
           </div>
@@ -90,7 +90,7 @@ function RuleModal({
             <input
               {...register('triggerDaysOffset')}
               type="number"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full field px-3 py-2 text-sm"
             />
             <p className="mt-1.5 text-xs text-brand-600 font-medium">
               → {offsetLabel(Number(offsetValue))}
@@ -276,7 +276,7 @@ export default function NotificationRulesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Notification Rules</h1>
+          <h1 className="text-[34px] leading-tight font-bold text-gray-900">Notification Rules</h1>
           <p className="text-sm text-gray-500 mt-1">
             Automate when and how clients receive payment reminders
           </p>
@@ -297,7 +297,7 @@ export default function NotificationRulesPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" />
         </div>
       ) : rules.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 flex flex-col items-center justify-center py-20 text-gray-400">
+        <div className="card flex flex-col items-center justify-center py-20 text-gray-400">
           <svg className="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

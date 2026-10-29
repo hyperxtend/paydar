@@ -62,14 +62,14 @@ export default function NotificationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Notification History</h1>
+          <h1 className="text-[34px] leading-tight font-bold text-gray-900">Notification History</h1>
           <p className="text-sm text-gray-500 mt-1">All outbound notification activity for your organisation</p>
         </div>
       </div>
 
       {/* Manual ping panel */}
       {invoices.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <div className="card p-4">
           <h2 className="text-sm font-semibold text-gray-700 mb-3">Manual Ping</h2>
           <div className="space-y-2">
             {invoices.slice(0, 5).map((inv) => (
@@ -78,7 +78,7 @@ export default function NotificationsPage() {
                   {inv.invoiceNumber} — {inv.clientName}
                 </span>
                 <select
-                  className="text-xs border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="text-xs field px-2 py-1"
                   value={pingChannel[inv.invoiceId] ?? 'EMAIL'}
                   onChange={(e) =>
                     setPingChannel((prev) => ({
@@ -107,7 +107,7 @@ export default function NotificationsPage() {
       )}
 
       {/* Notification log */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="card overflow-hidden">
         {notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-gray-400">
             <svg className="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">

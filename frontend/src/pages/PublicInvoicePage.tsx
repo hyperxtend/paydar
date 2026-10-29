@@ -55,7 +55,7 @@ export default function PublicInvoicePage() {
 
         {/* Brand header */}
         <div className="flex items-center justify-between">
-          <span className="text-lg font-semibold text-indigo-600">Ping 'n Pay</span>
+          <span className="text-lg font-semibold text-indigo-600">Paydar</span>
           <a
             href={pdfUrl}
             download
@@ -69,7 +69,7 @@ export default function PublicInvoicePage() {
         </div>
 
         {/* Invoice card */}
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="card overflow-hidden">
 
           {/* Status banner */}
           <div className={`px-6 py-3 flex items-center justify-between border-b border-gray-100 ${isPaid ? 'bg-green-50' : ''}`}>
@@ -196,7 +196,7 @@ export default function PublicInvoicePage() {
         </div>
 
         <p className="text-center text-xs text-gray-400">
-          Sent securely via Ping 'n Pay
+          Sent securely via Paydar
         </p>
       </div>
     </div>

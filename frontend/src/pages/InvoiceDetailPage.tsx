@@ -119,7 +119,7 @@ export default function InvoiceDetailPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{invoice.number}</h1>
+          <h1 className="text-[34px] leading-tight font-bold text-gray-900">{invoice.number}</h1>
           <div className="mt-1"><InvoiceStatusBadge status={invoice.status} /></div>
         </div>
         <div className="flex flex-wrap gap-2 justify-end">

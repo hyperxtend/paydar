@@ -80,7 +80,7 @@ export default function MfaSetupPage() {
     return (
       <div className="max-w-lg space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Two-Factor Authentication</h1>
+          <h1 className="text-[34px] leading-tight font-bold text-gray-900">Two-Factor Authentication</h1>
           <p className="text-sm text-gray-500 mt-1">Your account is protected with TOTP MFA.</p>
         </div>
 
@@ -107,7 +107,7 @@ export default function MfaSetupPage() {
               placeholder="000000"
               value={disableCode}
               onChange={(e) => setDisableCode(e.target.value)}
-              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="flex-1 field px-3 py-2 text-sm font-mono tracking-widest"
             />
             <button
               onClick={() => disable()}
@@ -128,7 +128,7 @@ export default function MfaSetupPage() {
     return (
       <div className="max-w-lg space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Two-Factor Authentication</h1>
+          <h1 className="text-[34px] leading-tight font-bold text-gray-900">Two-Factor Authentication</h1>
           <p className="text-sm text-gray-500 mt-1">Add an extra layer of security to your account.</p>
         </div>
 
@@ -163,7 +163,7 @@ export default function MfaSetupPage() {
   if (step === 'scan' && enrolData) {
     return (
       <div className="max-w-lg space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Set up MFA</h1>
+        <h1 className="text-[34px] leading-tight font-bold text-gray-900">Set up MFA</h1>
         <StepIndicator current="scan" />
 
         <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-5">
@@ -198,7 +198,7 @@ export default function MfaSetupPage() {
   if (step === 'confirm') {
     return (
       <div className="max-w-lg space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Set up MFA</h1>
+        <h1 className="text-[34px] leading-tight font-bold text-gray-900">Set up MFA</h1>
         <StepIndicator current="confirm" />
 
         <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-5">
@@ -220,7 +220,7 @@ export default function MfaSetupPage() {
             placeholder="000 000"
             value={confirmCode}
             onChange={(e) => setConfirmCode(e.target.value.replace(/\s/g, ''))}
-            className="block w-full px-4 py-3 text-center text-2xl font-mono tracking-widest border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="block w-full px-4 py-3 text-center text-2xl font-mono tracking-widest field"
             autoFocus
           />
 
@@ -248,7 +248,7 @@ export default function MfaSetupPage() {
   if (step === 'backup-codes') {
     return (
       <div className="max-w-lg space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Set up MFA</h1>
+        <h1 className="text-[34px] leading-tight font-bold text-gray-900">Set up MFA</h1>
         <StepIndicator current="backup-codes" />
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
