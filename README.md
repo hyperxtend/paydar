@@ -63,6 +63,25 @@ Flyway migrations run automatically on boot. The API comes up at **`http://local
 
 > **First run?** The app works out of the box — email, SMS, Stripe and MFA are all opt-in. Just register an account and go.
 
+#### Demo data (optional)
+
+Start the backend once with the `seed` profile to load two demo organisations, 8 clients, invoices in every status (with dates relative to today, so the aging buckets are populated), payments, notification rules and notification history:
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=seed
+```
+
+It skips itself if the demo data already exists. To start fresh, run `docker compose down -v && docker compose up -d`. Every account uses the password **`Paydar123!`**:
+
+| Email | Org | Role | Notes |
+|---|---|---|---|
+| `admin@lumen.test` | Lumen Studio (ZAR) | ADMIN | |
+| `finance@lumen.test` | Lumen Studio | FINANCE | |
+| `viewer@lumen.test` | Lumen Studio | VIEWER | |
+| `mfa@lumen.test` | Lumen Studio | ADMIN | MFA on. TOTP secret `JBSWY3DPEHPK3PXP`, backup codes `DEMO0001`–`DEMO0008` |
+| `disabled@lumen.test` | Lumen Studio | FINANCE | Account disabled, so login should be rejected |
+| `owner@northwind.test` | Northwind Traders (ZAR) | ADMIN | Second tenant, for testing data isolation |
+
 ### 3. Start the frontend
 
 ```bash
