@@ -58,6 +58,7 @@ export default function AuthLayout() {
 
   return (
     <Box
+      className="app-backdrop"
       sx={{
         minHeight: '100vh',
         display: 'flex',
@@ -65,14 +66,6 @@ export default function AuthLayout() {
         justifyContent: 'center',
         px: 2,
         py: 4,
-        // Brand-colour glows tint the doodle tile, all over a cool off-white base
-        background: [
-          'radial-gradient(700px 500px at 0% 0%, rgba(184, 0, 71, 0.16), transparent 70%)',
-          'radial-gradient(700px 500px at 100% 100%, rgba(223, 233, 102, 0.30), transparent 70%)',
-          'radial-gradient(900px 600px at 100% 0%, rgba(0, 45, 98, 0.12), transparent 70%)',
-          'url(/auth-pattern.svg) 0 0 / 400px 400px repeat',
-          '#F5F7FA',
-        ].join(', '),
       }}
     >
       <Paper
