@@ -1,5 +1,6 @@
 package com.paydar.notification.channel;
 
+import com.paydar.common.Money;
 import com.paydar.domain.notification.Notification;
 import com.paydar.domain.notification.NotificationChannel;
 import com.paydar.domain.notification.NotificationRepository;
@@ -40,11 +41,10 @@ public class SmsNotificationSender implements NotificationSender {
 
         try {
             var invoice = notification.getInvoice();
-            String body = "Paydar: Invoice %s for %s %,.2f is %s. Please arrange payment. Reply STOP to opt out."
+            String body = "Paydar: Invoice %s for %s is %s. Please arrange payment. Reply STOP to opt out."
                     .formatted(
                             invoice.getNumber(),
-                            invoice.getCurrency(),
-                            invoice.getTotal(),
+                            Money.format(invoice.getTotal(), invoice.getCurrency()),
                             invoice.getStatus().name().toLowerCase()
                     );
 

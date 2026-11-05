@@ -286,7 +286,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"clientId\": \"{{clientId}}\",\n  \"issueDate\": \"2026-08-14\",\n  \"dueDate\": \"2026-09-13\",\n  \"currency\": \"GBP\",\n  \"discountAmount\": 0,\n  \"notes\": \"Thanks for your business!\",\n  \"items\": [\n    {\n      \"description\": \"Consulting — August\",\n      \"quantity\": 10,\n      \"unitPrice\": 150.00,\n      \"taxRate\": 20\n    }\n  ]\n}"
+              "raw": "{\n  \"clientId\": \"{{clientId}}\",\n  \"issueDate\": \"2026-08-14\",\n  \"dueDate\": \"2026-09-13\",\n  \"currency\": \"ZAR\",\n  \"discountAmount\": 0,\n  \"notes\": \"Thanks for your business!\",\n  \"items\": [\n    {\n      \"description\": \"Consulting — August\",\n      \"quantity\": 10,\n      \"unitPrice\": 150.00,\n      \"taxRate\": 20\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/v1/invoices",

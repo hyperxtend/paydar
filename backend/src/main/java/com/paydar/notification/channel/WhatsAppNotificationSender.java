@@ -1,5 +1,6 @@
 package com.paydar.notification.channel;
 
+import com.paydar.common.Money;
 import com.paydar.domain.notification.Notification;
 import com.paydar.domain.notification.NotificationChannel;
 import com.paydar.domain.notification.NotificationRepository;
@@ -43,14 +44,13 @@ public class WhatsAppNotificationSender implements NotificationSender {
             String body = """
                     *Paydar — Invoice Reminder*
                     Invoice: *%s*
-                    Amount: *%s %,.2f*
+                    Amount: *%s*
                     Status: *%s*
                     Due: *%s*
                     Please arrange payment at your earliest convenience.
                     """.formatted(
                     invoice.getNumber(),
-                    invoice.getCurrency(),
-                    invoice.getTotal(),
+                    Money.format(invoice.getTotal(), invoice.getCurrency()),
                     invoice.getStatus().name(),
                     invoice.getDueDate()
             );

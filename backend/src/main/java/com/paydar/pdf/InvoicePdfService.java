@@ -3,6 +3,7 @@ package com.paydar.pdf;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import com.lowagie.text.pdf.draw.LineSeparator;
+import com.paydar.common.Money;
 import com.paydar.domain.invoice.Invoice;
 import com.paydar.domain.invoice.InvoiceItem;
 import org.springframework.stereotype.Service;
@@ -171,7 +172,7 @@ public class InvoicePdfService {
         boolean stripe = false;
         for (InvoiceItem item : invoice.getItems()) {
             Color bg = stripe ? LIGHT_BG : WHITE;
-            addItemRow(table, item.getDescription(), bodyFont, numFont, bg, item);
+            addItemRow(table, item.getDescription(), bodyFont, numFont, bg, item, invoice.getCurrency());
             stripe = !stripe;
         }
 
@@ -179,7 +180,7 @@ public class InvoicePdfService {
     }
 
     private void addItemRow(PdfPTable table, String desc, Font bodyFont, Font numFont,
-                            Color bg, InvoiceItem item) {
+                            Color bg, InvoiceItem item, String currency) {
         PdfPCell d = new PdfPCell(new Phrase(desc, bodyFont));
         d.setBorder(Rectangle.BOTTOM); d.setBorderColor(BORDER);
         d.setBackgroundColor(bg); d.setPadding(8);
@@ -191,13 +192,13 @@ public class InvoicePdfService {
         q.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(q);
 
-        PdfPCell u = new PdfPCell(new Phrase(money(item.getUnitPrice()), numFont));
+        PdfPCell u = new PdfPCell(new Phrase(money(item.getUnitPrice(), currency), numFont));
         u.setBorder(Rectangle.BOTTOM); u.setBorderColor(BORDER);
         u.setBackgroundColor(bg); u.setPadding(8);
         u.setHorizontalAlignment(Element.ALIGN_RIGHT);
         table.addCell(u);
 
-        PdfPCell a = new PdfPCell(new Phrase(money(item.getAmount()), numFont));
+        PdfPCell a = new PdfPCell(new Phrase(money(item.getAmount(), currency), numFont));
         a.setBorder(Rectangle.BOTTOM); a.setBorderColor(BORDER);
         a.setBackgroundColor(bg); a.setPadding(8);
         a.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -223,21 +224,21 @@ public class InvoicePdfService {
         PdfPTable totals = new PdfPTable(2);
         totals.setWidthPercentage(100);
 
-        addTotalRow(totals, "Subtotal",  money(invoice.getSubtotal()),       labelFont, valueFont, WHITE, false);
+        addTotalRow(totals, "Subtotal",  money(invoice.getSubtotal(), invoice.getCurrency()),       labelFont, valueFont, WHITE, false);
         if (invoice.getTaxAmount().signum() > 0) {
-            addTotalRow(totals, "Tax",   money(invoice.getTaxAmount()),       labelFont, valueFont, WHITE, false);
+            addTotalRow(totals, "Tax",   money(invoice.getTaxAmount(), invoice.getCurrency()),       labelFont, valueFont, WHITE, false);
         }
         if (invoice.getDiscountAmount().signum() > 0) {
-            addTotalRow(totals, "Discount", "−" + money(invoice.getDiscountAmount()), labelFont, valueFont, WHITE, false);
+            addTotalRow(totals, "Discount", "−" + money(invoice.getDiscountAmount(), invoice.getCurrency()), labelFont, valueFont, WHITE, false);
         }
         if (invoice.getAmountPaid().signum() > 0) {
-            addTotalRow(totals, "Amount Paid", "−" + money(invoice.getAmountPaid()), labelFont, valueFont, WHITE, false);
+            addTotalRow(totals, "Amount Paid", "−" + money(invoice.getAmountPaid(), invoice.getCurrency()), labelFont, valueFont, WHITE, false);
         }
 
         // Total due — highlighted
         addTotalRow(totals,
                 invoice.getBalanceDue().signum() <= 0 ? "PAID IN FULL" : "BALANCE DUE",
-                money(invoice.getBalanceDue()),
+                money(invoice.getBalanceDue(), invoice.getCurrency()),
                 totalLbl, totalVal, BRAND, true);
 
         PdfPCell right = new PdfPCell(totals);
@@ -307,9 +308,8 @@ public class InvoicePdfService {
         return p;
     }
 
-    private String money(java.math.BigDecimal amount) {
-        if (amount == null) return "0.00";
-        return String.format("%.2f", amount);
+    private String money(java.math.BigDecimal amount, String currency) {
+        return Money.format(amount, currency);
     }
 
     private Color statusBadgeColor(String status) {

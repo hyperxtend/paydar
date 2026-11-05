@@ -1,5 +1,6 @@
 package com.paydar.notification.channel;
 
+import com.paydar.common.Money;
 import com.paydar.domain.invoice.Invoice;
 import com.paydar.domain.notification.Notification;
 import com.paydar.domain.notification.NotificationChannel;
@@ -74,7 +75,7 @@ public class EmailNotificationSender implements NotificationSender {
     private String buildHtmlBody(Invoice invoice) {
         String clientName  = invoice.getClient().getName();
         String invoiceNum  = invoice.getNumber();
-        String amount      = "%s %.2f".formatted(invoice.getCurrency(), invoice.getTotal());
+        String amount      = Money.format(invoice.getTotal(), invoice.getCurrency());
         String dueDate     = invoice.getDueDate().toString();
 
         return """

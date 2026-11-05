@@ -32,7 +32,7 @@ public class Payment {
 
     @Column(nullable = false, length = 3)
     @Builder.Default
-    private String currency = "GBP";
+    private String currency = "ZAR";
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false)

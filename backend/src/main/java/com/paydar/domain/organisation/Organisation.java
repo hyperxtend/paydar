@@ -34,7 +34,7 @@ public class Organisation {
 
     @Column(nullable = false)
     @Builder.Default
-    private String currency = "GBP";
+    private String currency = "ZAR";
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

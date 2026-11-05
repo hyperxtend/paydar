@@ -67,7 +67,7 @@ public class Invoice {
 
     @Column(nullable = false)
     @Builder.Default
-    private String currency = "GBP";
+    private String currency = "ZAR";
 
     private String notes;
 

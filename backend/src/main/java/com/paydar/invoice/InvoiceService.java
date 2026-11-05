@@ -56,7 +56,7 @@ public class InvoiceService {
                 .number(number)
                 .issueDate(request.issueDate())
                 .dueDate(request.dueDate())
-                .currency(request.currency() != null ? request.currency() : "GBP")
+                .currency(request.currency() != null ? request.currency() : "ZAR")
                 .discountAmount(nvl(request.discountAmount()))
                 .notes(request.notes())
                 .build();
