@@ -2,10 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { publicApi } from '../api/public'
 import { STATUS_LABELS, STATUS_COLOURS } from '../types/invoice'
-
-function formatCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat('en-GB', { style: 'currency', currency }).format(amount)
-}
+import { formatMoney as formatCurrency } from '../lib/currency'
 
 function formatDate(date: string) {
   return new Intl.DateTimeFormat('en-GB', {
@@ -50,7 +47,7 @@ export default function PublicInvoicePage() {
   const pdfUrl    = publicApi.downloadPdfUrl(token!)
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-10 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
 
         {/* Brand header */}
@@ -72,7 +69,7 @@ export default function PublicInvoicePage() {
         <div className="card overflow-hidden">
 
           {/* Status banner */}
-          <div className={`px-6 py-3 flex items-center justify-between border-b border-gray-100 ${isPaid ? 'bg-green-50' : ''}`}>
+          <div className={`px-4 sm:px-6 py-3 flex items-center justify-between gap-3 border-b border-gray-100 ${isPaid ? 'bg-green-50' : ''}`}>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wide">Invoice from</p>
               <p className="font-semibold text-gray-900">{invoice.organisationName}</p>
@@ -82,14 +79,14 @@ export default function PublicInvoicePage() {
             </span>
           </div>
 
-          <div className="p-6 space-y-6">
+          <div className="p-4 sm:p-6 space-y-6">
             {/* Header row */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="min-w-0 break-words">
                 <p className="text-xs text-gray-500 mb-1">Bill to</p>
                 <p className="font-medium text-gray-900">{invoice.clientName}</p>
               </div>
-              <div className="text-right">
+              <div className="sm:text-right">
                 <p className="text-xs text-gray-500 mb-1">Invoice #{invoice.number}</p>
                 <p className="text-sm text-gray-600">Issued {formatDate(invoice.issueDate)}</p>
                 <p className="text-sm text-gray-600">Due {formatDate(invoice.dueDate)}</p>
@@ -101,18 +98,18 @@ export default function PublicInvoicePage() {
               <thead>
                 <tr className="text-xs text-gray-500 uppercase tracking-wide border-b border-gray-100">
                   <th className="pb-2 text-left font-medium">Description</th>
-                  <th className="pb-2 text-right font-medium">Qty</th>
-                  <th className="pb-2 text-right font-medium">Price</th>
-                  <th className="pb-2 text-right font-medium">Amount</th>
+                  <th className="pb-2 pl-3 text-right font-medium">Qty</th>
+                  <th className="hidden sm:table-cell pb-2 pl-3 text-right font-medium">Price</th>
+                  <th className="pb-2 pl-3 text-right font-medium">Amount</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {invoice.items.map((item, i) => (
                   <tr key={i}>
-                    <td className="py-2.5 text-gray-800">{item.description}</td>
-                    <td className="py-2.5 text-right text-gray-600">{item.quantity}</td>
-                    <td className="py-2.5 text-right text-gray-600">{formatCurrency(item.unitPrice, invoice.currency)}</td>
-                    <td className="py-2.5 text-right font-medium text-gray-900">{formatCurrency(item.amount, invoice.currency)}</td>
+                    <td className="py-2.5 text-gray-800 break-words">{item.description}</td>
+                    <td className="py-2.5 pl-3 text-right text-gray-600">{item.quantity}</td>
+                    <td className="hidden sm:table-cell py-2.5 pl-3 text-right text-gray-600 whitespace-nowrap">{formatCurrency(item.unitPrice, invoice.currency)}</td>
+                    <td className="py-2.5 pl-3 text-right font-medium text-gray-900 whitespace-nowrap">{formatCurrency(item.amount, invoice.currency)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -164,7 +161,7 @@ export default function PublicInvoicePage() {
 
           {/* CTA footer */}
           {isPayable && invoice.balanceDue > 0 && (
-            <div className="px-6 pb-6">
+            <div className="px-4 sm:px-6 pb-6">
               {invoice.stripeCheckoutUrl ? (
                 <a
                   href={invoice.stripeCheckoutUrl}
@@ -184,7 +181,7 @@ export default function PublicInvoicePage() {
           )}
 
           {isPaid && (
-            <div className="px-6 pb-6">
+            <div className="px-4 sm:px-6 pb-6">
               <div className="rounded-xl bg-green-50 border border-green-200 px-5 py-4 flex items-center gap-3">
                 <svg className="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />

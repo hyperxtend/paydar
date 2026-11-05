@@ -1,10 +1,12 @@
-import { useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { clientsApi } from '../api/clients'
 import { invoicesApi } from '../api/invoices'
+import Select from '../components/ui/Select'
+import { CURRENCIES, DEFAULT_CURRENCY, currencySymbol, formatMoney } from '../lib/currency'
 
 const itemSchema = z.object({
   description: z.string().min(1, 'Required'),
@@ -17,7 +19,7 @@ const schema = z.object({
   clientId:       z.string().uuid('Select a client'),
   issueDate:      z.string().min(1, 'Required'),
   dueDate:        z.string().min(1, 'Required'),
-  currency:       z.string().default('GBP'),
+  currency:       z.string().default(DEFAULT_CURRENCY),
   discountAmount: z.coerce.number().min(0).optional(),
   notes:          z.string().optional(),
   items:          z.array(itemSchema).min(1, 'Add at least one item'),
@@ -38,7 +40,7 @@ export default function CreateInvoicePage() {
   const { register, control, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      currency: 'GBP',
+      currency: DEFAULT_CURRENCY,
       items: [{ description: '', quantity: 1, unitPrice: 0, taxRate: 0 }],
     },
   })
@@ -47,6 +49,7 @@ export default function CreateInvoicePage() {
 
   const watchedItems    = useWatch({ control, name: 'items' })
   const watchedDiscount = useWatch({ control, name: 'discountAmount' })
+  const watchedCurrency = useWatch({ control, name: 'currency' })
 
   const subtotal = (watchedItems ?? []).reduce((sum, item) => {
     return sum + calcLineAmount(Number(item.quantity), Number(item.unitPrice))
@@ -69,34 +72,39 @@ export default function CreateInvoicePage() {
     navigate(`/invoices/${invoice.id}`)
   }
 
-  const fmt = (n: number) =>
-    new Intl.NumberFormat('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
+  const fmt = (n: number) => formatMoney(n, watchedCurrency)
+  const symbol = currencySymbol(watchedCurrency)
 
   return (
-    <div className="px-8 py-8 max-w-3xl">
-      <h1 className="text-[34px] leading-tight font-bold text-gray-900 mb-6">New invoice</h1>
+    <div className="lg:px-8 lg:py-8 max-w-3xl">
+      <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900 mb-6">New invoice</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
         {/* Client + dates */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 space-y-4">
           <h2 className="text-sm font-medium text-gray-700">Invoice details</h2>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Client</label>
-            <select
-              className="block w-full px-3 py-2 field text-sm"
-              {...register('clientId')}
-            >
-              <option value="">Select a client…</option>
-              {clients?.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+            <label htmlFor="clientId" className="block text-sm font-medium text-gray-700 mb-1">Client</label>
+            <Controller
+              control={control}
+              name="clientId"
+              render={({ field }) => (
+                <Select
+                  id="clientId"
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder="Select a client…"
+                  options={(clients ?? []).map((c) => ({ value: c.id, label: c.name }))}
+                />
+              )}
+            />
             {errors.clientId && <p className="mt-1 text-xs text-red-600">{errors.clientId.message}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Issue date</label>
               <input type="date" className="block w-full px-3 py-2 field text-sm" {...register('issueDate')} />
@@ -109,63 +117,81 @@ export default function CreateInvoicePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
-              <select className="block w-full px-3 py-2 field text-sm" {...register('currency')}>
-                {['GBP','USD','EUR','CAD','AUD'].map((c) => <option key={c}>{c}</option>)}
-              </select>
+              <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+              <Controller
+                control={control}
+                name="currency"
+                render={({ field }) => (
+                  <Select
+                    id="currency"
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    options={CURRENCIES.map((c) => ({ value: c.code, hint: c.symbol, label: `${c.name} (${c.code})` }))}
+                  />
+                )}
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Discount</label>
-              <input type="number" step="0.01" min="0" placeholder="0.00" className="block w-full px-3 py-2 field text-sm" {...register('discountAmount')} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Discount ({symbol})</label>
+              <input type="number" step="0.01" min="0" inputMode="decimal" placeholder="0.00" className="block w-full px-3 py-2 field text-sm" {...register('discountAmount')} />
             </div>
           </div>
         </div>
 
         {/* Line items */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
           <h2 className="text-sm font-medium text-gray-700 mb-3">Line items</h2>
 
           <div className="space-y-3">
-            <div className="grid grid-cols-12 gap-2 text-xs font-medium text-gray-500 px-1">
+            <div className="hidden sm:grid grid-cols-12 gap-2 text-xs font-medium text-gray-500 px-1">
               <span className="col-span-5">Description</span>
               <span className="col-span-2 text-right">Qty</span>
-              <span className="col-span-2 text-right">Price</span>
+              <span className="col-span-2 text-right">Price ({symbol})</span>
               <span className="col-span-2 text-right">Tax %</span>
             </div>
 
+            {/* Phones: description on its own row, then qty / price / tax with their own mini labels */}
             {fields.map((field, i) => (
-              <div key={field.id} className="grid grid-cols-12 gap-2 items-start">
-                <div className="col-span-5">
+              <div key={field.id} className="grid grid-cols-12 gap-2 items-end sm:items-start pb-3 border-b border-gray-100 last:border-0 sm:pb-0 sm:border-0">
+                <div className="col-span-12 sm:col-span-5">
                   <input
                     placeholder="Description"
+                    aria-label="Description"
                     className="block w-full px-3 py-2 field text-sm"
                     {...register(`items.${i}.description`)}
                   />
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-3 sm:col-span-2">
+                  <span className="sm:hidden block text-[11px] font-medium text-gray-500 mb-0.5">Qty</span>
                   <input
-                    type="number" step="0.01" min="0.01"
+                    type="number" step="0.01" min="0.01" inputMode="decimal"
+                    aria-label="Quantity"
                     className="block w-full px-3 py-2 field text-sm text-right"
                     {...register(`items.${i}.quantity`)}
                   />
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-5 sm:col-span-2">
+                  <span className="sm:hidden block text-[11px] font-medium text-gray-500 mb-0.5">Price ({symbol})</span>
                   <input
-                    type="number" step="0.01" min="0"
+                    type="number" step="0.01" min="0" inputMode="decimal"
+                    aria-label="Unit price"
                     className="block w-full px-3 py-2 field text-sm text-right"
                     {...register(`items.${i}.unitPrice`)}
                   />
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-3 sm:col-span-2">
+                  <span className="sm:hidden block text-[11px] font-medium text-gray-500 mb-0.5">Tax %</span>
                   <input
-                    type="number" step="0.1" min="0" max="100"
+                    type="number" step="0.1" min="0" max="100" inputMode="decimal"
+                    aria-label="Tax rate"
                     className="block w-full px-3 py-2 field text-sm text-right"
                     {...register(`items.${i}.taxRate`)}
                   />
                 </div>
-                <div className="col-span-1 flex items-center justify-center pt-2">
+                <div className="col-span-1 flex items-center justify-center pb-2 sm:pb-0 sm:pt-2">
                   {fields.length > 1 && (
                     <button type="button" onClick={() => remove(i)} className="text-gray-400 hover:text-red-500 text-lg leading-none">×</button>
                   )}
@@ -202,7 +228,7 @@ export default function CreateInvoicePage() {
         </div>
 
         {/* Notes */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
           <label className="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
           <textarea
             rows={3}

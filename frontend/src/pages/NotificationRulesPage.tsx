@@ -62,8 +62,9 @@ function RuleModal({
   })
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40">
+      {/* Bottom sheet on phones, centred dialog from sm up */}
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md sm:mx-4 max-h-[90dvh] overflow-y-auto">
         <div className="px-6 py-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-900">
             {rule ? 'Edit Rule' : 'New Notification Rule'}
@@ -231,7 +232,7 @@ function RuleCard({
         <div className="flex items-center gap-1 flex-shrink-0">
           <button
             onClick={onEdit}
-            className="p-1.5 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1.5 text-navy-500 hover:text-navy-700 rounded-lg hover:bg-navy-50 transition-colors"
             title="Edit"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -240,7 +241,7 @@ function RuleCard({
           </button>
           <button
             onClick={onDelete}
-            className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+            className="p-1.5 text-red-500 hover:text-red-700 rounded-lg hover:bg-red-50 transition-colors"
             title="Delete"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -274,9 +275,9 @@ export default function NotificationRulesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-[34px] leading-tight font-bold text-gray-900">Notification Rules</h1>
+          <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900">Notification Rules</h1>
           <p className="text-sm text-gray-500 mt-1">
             Automate when and how clients receive payment reminders
           </p>

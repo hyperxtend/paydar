@@ -1,10 +1,12 @@
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { paymentsApi } from '../api/payments'
 import { PAYMENT_METHOD_LABELS } from '../types/payment'
 import type { PaymentMethod } from '../types/payment'
+import Select from './ui/Select'
+import { currencySymbol, formatMoney } from '../lib/currency'
 
 const METHODS: PaymentMethod[] = ['BANK_TRANSFER', 'CARD', 'CASH', 'CHEQUE', 'OTHER']
 
@@ -28,7 +30,7 @@ interface Props {
 export function RecordPaymentModal({ invoiceId, balanceDue, currency, onClose }: Props) {
   const queryClient = useQueryClient()
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
+  const { register, control, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       amount: balanceDue,
@@ -54,12 +56,13 @@ export function RecordPaymentModal({ invoiceId, balanceDue, currency, onClose }:
   })
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40">
+      {/* Bottom sheet on phones, centred dialog from sm up */}
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md sm:mx-4 max-h-[90dvh] overflow-y-auto">
         <div className="px-6 py-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-900">Record Payment</h2>
           <p className="text-sm text-gray-500 mt-0.5">
-            Balance due: <span className="font-medium text-gray-700">{currency} {balanceDue.toFixed(2)}</span>
+            Balance due: <span className="font-medium text-gray-700">{formatMoney(balanceDue, currency)}</span>
           </p>
         </div>
 
@@ -67,11 +70,12 @@ export function RecordPaymentModal({ invoiceId, balanceDue, currency, onClose }:
           {/* Amount */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Amount ({currency})
+              Amount ({currencySymbol(currency)})
             </label>
             <input
               {...register('amount')}
               type="number"
+              inputMode="decimal"
               step="0.01"
               min="0.01"
               className="w-full field px-3 py-2 text-sm"
@@ -81,15 +85,20 @@ export function RecordPaymentModal({ invoiceId, balanceDue, currency, onClose }:
 
           {/* Payment method */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Payment method</label>
-            <select
-              {...register('paymentMethod')}
-              className="w-full field px-3 py-2 text-sm"
-            >
-              {METHODS.map((m) => (
-                <option key={m} value={m}>{PAYMENT_METHOD_LABELS[m]}</option>
-              ))}
-            </select>
+            <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700 mb-1">Payment method</label>
+            <Controller
+              control={control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <Select
+                  id="paymentMethod"
+                  value={field.value as PaymentMethod}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  options={METHODS.map((m) => ({ value: m, label: PAYMENT_METHOD_LABELS[m] }))}
+                />
+              )}
+            />
           </div>
 
           {/* Reference */}

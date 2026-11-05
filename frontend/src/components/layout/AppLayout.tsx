@@ -1,5 +1,5 @@
-import { Suspense } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { Suspense, useEffect, useState } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { NotificationBell } from '../NotificationBell'
 
@@ -14,20 +14,51 @@ const navItems = [
   { to: '/account',            label: 'Account',            icon: 'M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z' },
 ]
 
+function Wordmark({ className = '' }: { className?: string }) {
+  return (
+    <span className={`block font-['Inter'] font-extrabold leading-none tracking-[-0.045em] text-navy-700 ${className}`}>
+      Pay<span className="text-brand-600">dar</span>
+    </span>
+  )
+}
+
 export default function AppLayout() {
   const { user, logout } = useAuth()
   const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}`.toUpperCase()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const { pathname } = useLocation()
+
+  // Close the phone drawer whenever the route changes
+  useEffect(() => setMenuOpen(false), [pathname])
 
   return (
-    <div className="h-screen flex bg-gray-50">
-      {/* Sidebar */}
-      <aside className="glass w-64 flex flex-col border-r border-black/5">
+    <div className="h-[100dvh] flex bg-[#F5F7FA]">
+      {/* Phone: dim the page behind the open drawer */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-30 bg-black/30 lg:hidden" onClick={() => setMenuOpen(false)} aria-hidden="true" />
+      )}
+
+      {/* Sidebar: fixed slide-out drawer on phones, static column from lg up */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 w-72 bg-white/95 backdrop-blur-xl backdrop-saturate-150 flex flex-col border-r border-black/5 transition-transform duration-200
+          lg:static lg:z-auto lg:w-64 lg:translate-x-0 lg:bg-white/70 ${menuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}
+      >
         <div className="px-5 pt-6 pb-5 flex items-center gap-3">
-          <img src="/bell-logo.svg" alt="" className="h-9 w-9" />
-          <div className="min-w-0">
-            <span className="block font-display font-bold text-lg leading-tight text-navy-600">Paydar</span>
-            <p className="text-xs text-gray-500 truncate">{user?.organisationName}</p>
+          <img src="/radar-logo.svg" alt="" className="h-9 w-9 flex-shrink-0" />
+          <div className="min-w-0 flex-1">
+            {/* Same two-tone wordmark as the login screen */}
+            <Wordmark className="text-[22px]" />
+            <p className="mt-1 text-xs text-gray-500 truncate">{user?.organisationName}</p>
           </div>
+          <button
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close menu"
+            className="lg:hidden -mr-2 p-2 rounded-lg text-gray-500 hover:bg-gray-100"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">
@@ -36,17 +67,17 @@ export default function AppLayout() {
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-[15px] font-medium transition-colors ${
+                `flex items-center gap-3 px-3 py-2.5 lg:py-2 rounded-lg text-[15px] font-medium transition-colors ${
                   isActive
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'text-gray-700 hover:bg-black/[0.04]'
+                    ? 'bg-navy-600 text-white shadow-sm'
+                    : 'text-gray-700 hover:bg-navy-50 hover:text-navy-700'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
                   <svg
-                    className={`h-5 w-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-brand-600'}`}
+                    className={`h-5 w-5 flex-shrink-0 ${isActive ? 'text-confetti' : 'text-navy-500'}`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -61,7 +92,7 @@ export default function AppLayout() {
           ))}
         </nav>
 
-        <div className="m-3 p-3 rounded-xl bg-black/[0.03] flex items-center gap-3">
+        <div className="m-3 p-3 rounded-xl bg-navy-50/70 flex items-center gap-3">
           <span className="h-9 w-9 rounded-full bg-navy-600 text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">
             {initials}
           </span>
@@ -77,12 +108,26 @@ export default function AppLayout() {
       </aside>
 
       {/* Main content scrolls under the frosted top bar */}
-      <div className="flex-1 overflow-y-auto">
-        <header className="glass sticky top-0 z-20 h-14 border-b border-black/5 flex items-center justify-end px-8">
+      <div className="flex-1 min-w-0 overflow-y-auto">
+        <header className="glass sticky top-0 z-20 h-14 border-b border-black/5 flex items-center justify-between lg:justify-end px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={menuOpen}
+              className="-ml-2 p-2 rounded-lg text-navy-700 hover:bg-navy-50"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
+            <img src="/radar-logo.svg" alt="" className="h-7 w-7" />
+            <Wordmark className="text-lg" />
+          </div>
           <NotificationBell />
         </header>
 
-        <main className="max-w-6xl mx-auto px-8 py-8">
+        <main className="max-w-6xl mx-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <Suspense fallback={null}>
             <Outlet />
           </Suspense>

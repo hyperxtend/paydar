@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { notificationsApi } from '../api/notifications'
 import { CHANNEL_LABELS, STATUS_COLOURS } from '../types/notification'
 import type { NotificationChannel, NotificationRecord } from '../types/notification'
+import Select from '../components/ui/Select'
 
 const CHANNELS: NotificationChannel[] = ['EMAIL', 'SMS', 'WHATSAPP', 'IN_APP']
 
@@ -62,7 +63,7 @@ export default function NotificationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[34px] leading-tight font-bold text-gray-900">Notification History</h1>
+          <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900">Notification History</h1>
           <p className="text-sm text-gray-500 mt-1">All outbound notification activity for your organisation</p>
         </div>
       </div>
@@ -74,23 +75,19 @@ export default function NotificationsPage() {
           <div className="space-y-2">
             {invoices.slice(0, 5).map((inv) => (
               <div key={inv.invoiceId} className="flex items-center gap-3 flex-wrap">
-                <span className="text-sm text-gray-700 w-40 truncate">
+                <span className="text-sm text-gray-700 basis-full sm:basis-auto sm:w-40 truncate">
                   {inv.invoiceNumber} — {inv.clientName}
                 </span>
-                <select
-                  className="text-xs field px-2 py-1"
+                <Select
+                  size="sm"
+                  className="w-32"
+                  aria-label={`Channel for ${inv.invoiceNumber}`}
                   value={pingChannel[inv.invoiceId] ?? 'EMAIL'}
-                  onChange={(e) =>
-                    setPingChannel((prev) => ({
-                      ...prev,
-                      [inv.invoiceId]: e.target.value as NotificationChannel,
-                    }))
+                  onChange={(channel) =>
+                    setPingChannel((prev) => ({ ...prev, [inv.invoiceId]: channel }))
                   }
-                >
-                  {CHANNELS.map((c) => (
-                    <option key={c} value={c}>{CHANNEL_LABELS[c]}</option>
-                  ))}
-                </select>
+                  options={CHANNELS.map((c) => ({ value: c, label: CHANNEL_LABELS[c] }))}
+                />
                 <button
                   disabled={pinging}
                   onClick={() =>

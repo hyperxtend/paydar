@@ -2,10 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { reportsApi } from '../api/reports'
 import type { DashboardMetrics } from '../types/reporting'
-
-function fmt(amount: number, currency = 'GBP') {
-  return new Intl.NumberFormat('en-GB', { style: 'currency', currency }).format(amount)
-}
+import { formatMoney as fmt } from '../lib/currency'
 
 function MetricCard({
   label,
@@ -26,12 +23,12 @@ function MetricCard({
     gray:   'bg-gray-300',
   }
   return (
-    <div className="card p-5">
+    <div className="card p-4 sm:p-5 min-w-0">
       <p className="flex items-center gap-2 text-[13px] font-medium text-gray-500">
-        <span className={`h-2 w-2 rounded-full ${dot[colour]}`} />
+        <span className={`h-2 w-2 flex-shrink-0 rounded-full ${dot[colour]}`} />
         {label}
       </p>
-      <p className="mt-2 text-[28px] leading-tight font-semibold tracking-tight text-gray-900 tabular-nums">{value}</p>
+      <p className="mt-2 text-lg sm:text-[28px] leading-tight break-words font-semibold tracking-tight text-gray-900 tabular-nums">{value}</p>
       {sub && <p className="mt-1 text-xs text-gray-500">{sub}</p>}
     </div>
   )
@@ -50,8 +47,18 @@ function StatusBar({ metrics }: { metrics: DashboardMetrics }) {
   ].filter((s) => s.count > 0)
 
   return (
-    <div className="card p-5">
-      <h2 className="text-sm font-semibold text-gray-700 mb-3">Invoice status breakdown</h2>
+    <div className=" mb-4 mt-4">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 my-4">
+        <h2 className="text-sm font-semibold text-gray-700">Invoice status breakdown</h2>
+        <div className="flex flex-wrap gap-4">
+          {segments.map((s) => (
+            <ul key={s.label} className="flex items-center gap-1.5">
+              <span className={`h-2.5 w-2.5 rounded-full ${s.colour}`} />
+              <span className="text-xs text-gray-600">{s.label} <span className="font-medium">{s.count}</span></span>
+            </ul>
+          ))}
+        </div>
+      </div>
       <div className="flex rounded-full overflow-hidden h-4">
         {segments.map((s) => (
           <div
@@ -60,14 +67,6 @@ function StatusBar({ metrics }: { metrics: DashboardMetrics }) {
             style={{ width: `${(s.count / total) * 100}%` }}
             title={`${s.label}: ${s.count}`}
           />
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-4 mt-3">
-        {segments.map((s) => (
-          <div key={s.label} className="flex items-center gap-1.5">
-            <span className={`h-2.5 w-2.5 rounded-full ${s.colour}`} />
-            <span className="text-xs text-gray-600">{s.label} <span className="font-medium">{s.count}</span></span>
-          </div>
         ))}
       </div>
     </div>
@@ -93,20 +92,20 @@ function AgingBars({ metrics }: { metrics: DashboardMetrics }) {
           to="/reports"
           className="text-xs text-brand-600 hover:text-brand-700 font-medium"
         >
-          Full report →
+         view report →
         </Link>
       </div>
       <div className="space-y-3">
         {buckets.map((b) => (
           <div key={b.label} className="flex items-center gap-3">
-            <span className="text-xs text-gray-500 w-20 flex-shrink-0">{b.label}</span>
-            <div className="flex-1 bg-gray-100 rounded-full h-2.5 overflow-hidden">
+            <span className="text-xs text-gray-500 w-[4.5rem] sm:w-20 flex-shrink-0">{b.label}</span>
+            <div className="flex-1 min-w-0 bg-gray-100 rounded-full h-2.5 overflow-hidden">
               <div
                 className={`${b.colour} h-full rounded-full transition-all duration-500`}
                 style={{ width: `${(b.value / max) * 100}%` }}
               />
             </div>
-            <span className="text-xs font-medium text-gray-700 w-24 text-right tabular-nums">
+            <span className="text-xs font-medium text-gray-700 w-24 sm:w-28 text-right tabular-nums whitespace-nowrap">
               {fmt(b.value)}
             </span>
           </div>
@@ -133,13 +132,39 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-[34px] leading-tight font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">Your organisation at a glance</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900">Dashboard</h1>
+        </div>
+
+        {/* Quick actions */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/notification-rules"
+            className="btn-secondary"
+          >
+            <svg className="h-4 w-4 flex-shrink-0 text-navy-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            Notification rules
+          </Link>
+          <Link
+            to="/invoices/new"
+            className="btn-primary"
+          >
+            <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.25}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            New invoice
+          </Link>
+        </div>
       </div>
 
+      {/* Status breakdown bar */}
+      <StatusBar metrics={metrics} />
+
       {/* KPI cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <MetricCard
           label="Total invoiced"
           value={fmt(metrics.totalInvoiced)}
@@ -163,39 +188,8 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Status breakdown bar */}
-      <StatusBar metrics={metrics} />
-
       {/* Aging chart */}
       <AgingBars metrics={metrics} />
-
-      {/* Quick links */}
-      <div className="grid grid-cols-2 gap-4">
-        <Link
-          to="/invoices/new"
-          className="flex items-center gap-3 bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-2xl p-4 shadow-card hover:brightness-110 transition"
-        >
-          <svg className="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          <div>
-            <p className="font-semibold text-sm">New invoice</p>
-            <p className="text-xs text-brand-200">Create and send</p>
-          </div>
-        </Link>
-        <Link
-          to="/notification-rules"
-          className="card flex items-center gap-3 text-gray-700 p-4 hover:bg-gray-50 transition-colors"
-        >
-          <svg className="h-6 w-6 flex-shrink-0 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-          <div>
-            <p className="font-semibold text-sm">Notification rules</p>
-            <p className="text-xs text-gray-500">Automate reminders</p>
-          </div>
-        </Link>
-      </div>
     </div>
   )
 }

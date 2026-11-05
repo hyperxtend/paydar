@@ -80,7 +80,7 @@ export default function MfaSetupPage() {
     return (
       <div className="max-w-lg space-y-6">
         <div>
-          <h1 className="text-[34px] leading-tight font-bold text-gray-900">Two-Factor Authentication</h1>
+          <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900">Two-Factor Authentication</h1>
           <p className="text-sm text-gray-500 mt-1">Your account is protected with TOTP MFA.</p>
         </div>
 
@@ -128,7 +128,7 @@ export default function MfaSetupPage() {
     return (
       <div className="max-w-lg space-y-6">
         <div>
-          <h1 className="text-[34px] leading-tight font-bold text-gray-900">Two-Factor Authentication</h1>
+          <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900">Two-Factor Authentication</h1>
           <p className="text-sm text-gray-500 mt-1">Add an extra layer of security to your account.</p>
         </div>
 
@@ -163,7 +163,7 @@ export default function MfaSetupPage() {
   if (step === 'scan' && enrolData) {
     return (
       <div className="max-w-lg space-y-6">
-        <h1 className="text-[34px] leading-tight font-bold text-gray-900">Set up MFA</h1>
+        <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900">Set up MFA</h1>
         <StepIndicator current="scan" />
 
         <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-5">
@@ -198,7 +198,7 @@ export default function MfaSetupPage() {
   if (step === 'confirm') {
     return (
       <div className="max-w-lg space-y-6">
-        <h1 className="text-[34px] leading-tight font-bold text-gray-900">Set up MFA</h1>
+        <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900">Set up MFA</h1>
         <StepIndicator current="confirm" />
 
         <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-5">
@@ -248,7 +248,7 @@ export default function MfaSetupPage() {
   if (step === 'backup-codes') {
     return (
       <div className="max-w-lg space-y-6">
-        <h1 className="text-[34px] leading-tight font-bold text-gray-900">Set up MFA</h1>
+        <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900">Set up MFA</h1>
         <StepIndicator current="backup-codes" />
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
