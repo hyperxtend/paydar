@@ -7,6 +7,7 @@ import { PAYMENT_METHOD_LABELS } from '../types/payment'
 import InvoiceStatusBadge from '../components/InvoiceStatusBadge'
 import { RecordPaymentModal } from '../components/RecordPaymentModal'
 import type { InvoiceStatus } from '../types/invoice'
+import { formatMoney as formatCurrency } from '../lib/currency'
 
 function useShareLink(shareToken?: string) {
   const [copied, setCopied] = useState(false)
@@ -21,9 +22,6 @@ function useShareLink(shareToken?: string) {
   return { copied, copy }
 }
 
-function formatCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat('en-GB', { style: 'currency', currency }).format(amount)
-}
 
 function formatDate(date: string) {
   return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(date))
@@ -96,7 +94,7 @@ export default function InvoiceDetailPage() {
   const balanceDue = invoice.balanceDue ?? (invoice.total - (invoice.amountPaid ?? 0))
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500">
         <Link to="/invoices" className="hover:text-gray-900">Invoices</Link>
@@ -117,12 +115,12 @@ export default function InvoiceDetailPage() {
       )}
 
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{invoice.number}</h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex-shrink-0">
+          <h1 className="text-[26px] sm:text-[32px] leading-tight font-bold text-gray-900">{invoice.number}</h1>
           <div className="mt-1"><InvoiceStatusBadge status={invoice.status} /></div>
         </div>
-        <div className="flex flex-wrap gap-2 justify-end">
+        <div className="flex flex-wrap gap-2 sm:justify-end">
           {/* Status transition buttons */}
           {actions.map((action) => (
             <button
@@ -192,42 +190,49 @@ export default function InvoiceDetailPage() {
       </div>
 
       {/* Invoice card */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6">
+      <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6 space-y-6">
         {/* Header */}
-        <div className="grid grid-cols-2 gap-6 pb-4 border-b border-gray-100">
-          <div>
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Bill to</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-4 border-b border-gray-100">
+          <div className="space-y-2 min-w-0 break-words">
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Billed to</p>
             <p className="font-medium text-gray-900">{invoice.client.name}</p>
             <p className="text-sm text-gray-600">{invoice.client.email}</p>
             {invoice.client.phone && <p className="text-sm text-gray-500">{invoice.client.phone}</p>}
             {invoice.client.address && <p className="text-sm text-gray-500">{invoice.client.address}</p>}
           </div>
-          <div className="text-right">
+          {/* Sits against the card's right edge, contents left-aligned so the labels stack in a column */}
+          <div className="sm:justify-self-end space-y-2">
             <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Dates</p>
-            <p className="text-sm text-gray-700"><span className="text-gray-400">Issued </span>{formatDate(invoice.issueDate)}</p>
-            <p className="text-sm text-gray-700"><span className="text-gray-400">Due </span>{formatDate(invoice.dueDate)}</p>
+            <div>
+              <p className="text-xs text-gray-400">Issued on</p>
+              <p className="text-sm text-gray-700">{formatDate(invoice.issueDate)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400">Due</p>
+              <p className="text-sm text-gray-700">{formatDate(invoice.dueDate)}</p>
+            </div>
           </div>
         </div>
 
-        {/* Line items */}
+        {/* Line items; Price and Tax drop off on phones (Amount already carries the line total) */}
         <table className="min-w-full text-sm">
           <thead>
             <tr className="text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-100">
               <th className="pb-2 text-left">Description</th>
-              <th className="pb-2 text-right">Qty</th>
-              <th className="pb-2 text-right">Price</th>
-              <th className="pb-2 text-right">Tax</th>
-              <th className="pb-2 text-right">Amount</th>
+              <th className="pb-2 pl-3 text-right">Qty</th>
+              <th className="hidden sm:table-cell pb-2 pl-3 text-right">Price</th>
+              <th className="hidden sm:table-cell pb-2 pl-3 text-right">Tax</th>
+              <th className="pb-2 pl-3 text-right">Amount</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
             {invoice.items.map((item) => (
               <tr key={item.id}>
-                <td className="py-2 text-gray-800">{item.description}</td>
-                <td className="py-2 text-right text-gray-600">{item.quantity}</td>
-                <td className="py-2 text-right text-gray-600">{formatCurrency(item.unitPrice, invoice.currency)}</td>
-                <td className="py-2 text-right text-gray-500">{item.taxRate}%</td>
-                <td className="py-2 text-right font-medium text-gray-900">{formatCurrency(item.amount, invoice.currency)}</td>
+                <td className="py-2 text-gray-800 break-words">{item.description}</td>
+                <td className="py-2 pl-3 text-right text-gray-600">{item.quantity}</td>
+                <td className="hidden sm:table-cell py-2 pl-3 text-right text-gray-600 whitespace-nowrap">{formatCurrency(item.unitPrice, invoice.currency)}</td>
+                <td className="hidden sm:table-cell py-2 pl-3 text-right text-gray-500">{item.taxRate}%</td>
+                <td className="py-2 pl-3 text-right font-medium text-gray-900 whitespace-nowrap">{formatCurrency(item.amount, invoice.currency)}</td>
               </tr>
             ))}
           </tbody>
@@ -265,7 +270,7 @@ export default function InvoiceDetailPage() {
 
       {/* Payment history */}
       {payments.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-xl overflow-x-auto">
           <div className="px-5 py-3 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-900">Payment history</h2>
           </div>
@@ -285,7 +290,7 @@ export default function InvoiceDetailPage() {
                   <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">
                     {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(p.paidAt))}
                   </td>
-                  <td className="px-4 py-2.5 text-gray-600">{PAYMENT_METHOD_LABELS[p.paymentMethod]}</td>
+                  <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">{PAYMENT_METHOD_LABELS[p.paymentMethod]}</td>
                   <td className="px-4 py-2.5 text-gray-500 truncate max-w-[140px]">{p.reference ?? '—'}</td>
                   <td className="px-4 py-2.5 text-gray-500">{p.recordedBy ?? 'Stripe'}</td>
                   <td className="px-4 py-2.5 font-medium text-gray-900 whitespace-nowrap">

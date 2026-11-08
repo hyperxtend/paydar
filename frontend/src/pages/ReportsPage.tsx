@@ -1,10 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { reportsApi } from '../api/reports'
 import type { AgingRow } from '../types/reporting'
-
-function fmt(amount: number, currency = 'GBP') {
-  return new Intl.NumberFormat('en-GB', { style: 'currency', currency }).format(amount)
-}
+import { formatMoney as fmt } from '../lib/currency'
 
 function agingColour(days: number) {
   if (days === 0)  return 'text-blue-600 bg-blue-50'
@@ -26,7 +23,7 @@ function AgingBucket({
   return (
     <div className={`rounded-xl border-l-4 ${accent} bg-white border border-gray-200 p-4`}>
       <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">{label}</p>
-      <p className="mt-1.5 text-xl font-bold text-gray-900 tabular-nums">{fmt(amount)}</p>
+      <p className="mt-1.5 text-lg sm:text-xl font-bold text-gray-900 tabular-nums break-words">{fmt(amount)}</p>
     </div>
   )
 }
@@ -67,7 +64,7 @@ function AgingTable({ rows }: { rows: AgingRow[] }) {
                   {row.daysOverdue === 0 ? 'Current' : `${row.daysOverdue} days`}
                 </span>
               </td>
-              <td className="px-4 py-3 font-semibold text-gray-900 tabular-nums">
+              <td className="px-4 py-3 font-semibold text-gray-900 tabular-nums whitespace-nowrap">
                 {fmt(row.balanceDue, row.currency)}
               </td>
             </tr>
@@ -86,9 +83,9 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
+          <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900">Reports</h1>
           <p className="text-sm text-gray-500 mt-1">Accounts receivable aging and invoice export</p>
         </div>
         <button
@@ -118,7 +115,7 @@ export default function ReportsPage() {
           </div>
 
           {/* Aging table */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="card overflow-hidden">
             <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-gray-900">Outstanding invoices</h2>
               <span className="text-xs text-gray-500">{aging.rows.length} record{aging.rows.length !== 1 ? 's' : ''}</span>

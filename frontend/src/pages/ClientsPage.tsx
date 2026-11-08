@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { clientsApi } from '../api/clients'
 import type { Client } from '../types/client'
+import ConfirmDialog from '../components/ui/ConfirmDialog'
 
 const schema = z.object({
   name:    z.string().min(1, 'Name is required'),
@@ -29,19 +30,33 @@ function ClientForm({
     resolver: zodResolver(schema),
     defaultValues,
   })
+  // The add form and an edit form can be open at once, so ids must be unique per instance
+  const id = useId()
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <div>
-        <input placeholder="Name *" className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" {...register('name')} />
+        <label htmlFor={`${id}-name`} className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+        <input id={`${id}-name`} className="block w-full px-3 py-2 field text-sm" {...register('name')} />
         {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>}
       </div>
       <div>
-        <input placeholder="Email *" type="email" className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" {...register('email')} />
+        <label htmlFor={`${id}-email`} className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input id={`${id}-email`} type="email" className="block w-full px-3 py-2 field text-sm" {...register('email')} />
         {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
       </div>
-      <input placeholder="Phone" className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" {...register('phone')} />
-      <textarea placeholder="Address" rows={2} className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none" {...register('address')} />
+      <div>
+        <label htmlFor={`${id}-phone`} className="block text-sm font-medium text-gray-700 mb-1">
+          Phone <span className="text-gray-400 font-normal">(optional)</span>
+        </label>
+        <input id={`${id}-phone`} type="tel" className="block w-full px-3 py-2 field text-sm" {...register('phone')} />
+      </div>
+      <div>
+        <label htmlFor={`${id}-address`} className="block text-sm font-medium text-gray-700 mb-1">
+          Address <span className="text-gray-400 font-normal">(optional)</span>
+        </label>
+        <textarea id={`${id}-address`} rows={2} className="block w-full px-3 py-2 field text-sm resize-none" {...register('address')} />
+      </div>
       <div className="flex gap-2 pt-1">
         <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors">
           {isSubmitting ? 'Saving…' : 'Save'}
@@ -57,6 +72,7 @@ function ClientForm({
 export default function ClientsPage() {
   const [adding, setAdding]       = useState(false)
   const [editing, setEditing]     = useState<Client | null>(null)
+  const [deleting, setDeleting]   = useState<Client | null>(null)
   const qc = useQueryClient()
 
   const { data: clients, isLoading } = useQuery({ queryKey: ['clients'], queryFn: clientsApi.list })
@@ -73,18 +89,21 @@ export default function ClientsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: clientsApi.delete,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['clients'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['clients'] }); setDeleting(null) },
   })
 
+  const cancelDelete = () => { setDeleting(null); deleteMutation.reset() }
+
   return (
-    <div className="px-8 py-8 max-w-2xl">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">Clients</h1>
+    <div className="max-w-2xl mx-auto">
+      {/* Sticks under the top bar; the negative margin cancels main's top padding so cards can't peek above */}
+      <div className="sticky top-14 z-20 -mt-6 pt-6 lg:-mt-8 lg:pt-8 pb-4 mb-2 bg-[#F5F7FA] flex items-center justify-between gap-3">
+        <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900">Clients</h1>
         {!adding && (
-          <button
-            onClick={() => setAdding(true)}
-            className="px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
-          >
+          <button onClick={() => setAdding(true)} className="btn-primary">
+            <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.25}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
             Add client
           </button>
         )}
@@ -118,20 +137,33 @@ export default function ClientsPage() {
                   />
                 </>
               ) : (
-                <div className="flex items-start justify-between">
-                  <div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 break-words">
                     <p className="font-medium text-gray-900">{client.name}</p>
                     <p className="text-sm text-gray-600">{client.email}</p>
                     {client.phone && <p className="text-sm text-gray-500">{client.phone}</p>}
                     {client.address && <p className="text-sm text-gray-400">{client.address}</p>}
                   </div>
-                  <div className="flex gap-2 text-sm">
-                    <button onClick={() => setEditing(client)} className="text-gray-500 hover:text-gray-800">Edit</button>
+                  <div className="flex flex-shrink-0 gap-1 -mr-2 -mt-1">
                     <button
-                      onClick={() => { if (confirm(`Delete ${client.name}?`)) deleteMutation.mutate(client.id) }}
-                      className="text-red-400 hover:text-red-600"
+                      onClick={() => setEditing(client)}
+                      aria-label={`Edit ${client.name}`}
+                      title="Edit"
+                      className="p-2 rounded-lg text-navy-500 hover:text-navy-700 hover:bg-navy-50 transition-colors"
                     >
-                      Delete
+                      <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => setDeleting(client)}
+                      aria-label={`Delete ${client.name}`}
+                      title="Delete"
+                      className="p-2 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors"
+                    >
+                      <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -144,6 +176,19 @@ export default function ClientsPage() {
           <p className="text-gray-500 text-sm">No clients yet.</p>
           <button onClick={() => setAdding(true)} className="mt-3 text-sm text-brand-600 font-medium hover:text-brand-700">Add your first client →</button>
         </div>
+      )}
+
+      {deleting && (
+        <ConfirmDialog
+          title="Delete client?"
+          message={<><span className="font-medium text-gray-900">{deleting.name}</span> will be permanently removed. This can't be undone.</>}
+          confirmLabel="Delete client"
+          pendingLabel="Deleting…"
+          isPending={deleteMutation.isPending}
+          error={deleteMutation.isError ? "Couldn't delete this client. Please try again." : null}
+          onConfirm={() => deleteMutation.mutate(deleting.id)}
+          onCancel={cancelDelete}
+        />
       )}
     </div>
   )

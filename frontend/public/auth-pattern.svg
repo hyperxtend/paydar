@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400" width="400" height="400">
+  <!--
+    Seamless finance doodle tile. Every icon sits fully inside the tile so it
+    repeats without seams. Each icon gets its own brand color (Lipstick, Dark
+    Blue, Confetti, Rose, Slate Blue), arranged so neighbours never match, even
+    across tile edges. Low opacity so it sits quietly on the auth gradient.
+  -->
+  <defs>
+    <!-- each icon is drawn in a 48x48 box -->
+    <g id="bag">
+      <path d="M18 8h12l-4 7h-4z" />
+      <path d="M20 15C8 22 4 34 8 40c2 4 6 5 16 5s14-1 16-5c4-6 0-18-12-25" />
+      <path d="M28 25c-1-2-3-3-5-2.5s-3 2-2.5 3.5 2 2 3.5 2.5 3 1.5 3 3-1.5 3-4 3-4-1-4.5-2.5M24 20.5v2.5M24 35.5v2.5" />
+    </g>
+    <g id="coins">
+      <ellipse cx="24" cy="12" rx="14" ry="5" />
+      <path d="M10 12v8c0 2.8 6.3 5 14 5s14-2.2 14-5v-8M10 20v8c0 2.8 6.3 5 14 5s14-2.2 14-5v-8M10 28v8c0 2.8 6.3 5 14 5s14-2.2 14-5v-8" />
+    </g>
+    <g id="wallet">
+      <rect x="6" y="10" width="36" height="28" rx="4" />
+      <path d="M42 18H32a6 6 0 0 0 0 12h10" />
+      <circle cx="32" cy="24" r="1.5" />
+    </g>
+    <g id="calculator">
+      <rect x="10" y="6" width="28" height="36" rx="3" />
+      <path d="M24 6v36M10 24h28M15 15h5M17.5 12.5v5M28 15h5M15 31l4 4M19 31l-4 4M28 31h5M28 35h5" />
+    </g>
+    <g id="receipt">
+      <path d="M12 6h24v36l-4-3-4 3-4-3-4 3-4-3-4 3z" />
+      <path d="M18 16h12M18 22h12M18 28h8" />
+    </g>
+    <g id="bank">
+      <path d="M6 18L24 8l18 10z" />
+      <circle cx="24" cy="14" r="1.5" />
+      <path d="M8 40h32M6 44h36M12 22v14M20 22v14M28 22v14M36 22v14" />
+    </g>
+    <g id="pencil">
+      <g transform="rotate(-45 24 24)">
+        <path d="M6 24l6-4h28v8H12z" />
+        <path d="M34 20v8" />
+      </g>
+    </g>
+    <g id="padlock">
+      <rect x="14" y="22" width="20" height="18" rx="3" />
+      <path d="M18 22v-6a6 6 0 0 1 12 0v6M24 29v4" />
+    </g>
+    <g id="check">
+      <path d="M14 24l7 7 13-14" />
+    </g>
+    <g id="shield">
+      <path d="M24 6l14 5v11c0 9-6 15-14 19-8-4-14-10-14-19V11z" />
+      <path d="M18 24l4 4 8-8" />
+    </g>
+    <g id="banknote">
+      <rect x="4" y="12" width="40" height="24" rx="3" />
+      <circle cx="24" cy="24" r="5" />
+      <path d="M4 18a6 6 0 0 0 6-6M38 12a6 6 0 0 0 6 6M44 30a6 6 0 0 0-6 6M10 36a6 6 0 0 0-6-6" />
+    </g>
+    <g id="card">
+      <rect x="4" y="12" width="40" height="26" rx="3" />
+      <path d="M4 19h40M10 30h10M24 30h4" />
+    </g>
+    <g id="chart">
+      <path d="M12 6h18l8 8v28H12z" />
+      <path d="M30 6v8h8M17 34l6-7 5 4 6-8" />
+    </g>
+    <g id="bell">
+      <path d="M14 9a14 14 0 0 1 20 0" />
+      <circle cx="24" cy="23" r="11" />
+      <circle cx="24" cy="23" r="3" />
+      <rect x="16" y="36" width="16" height="6" rx="2" />
+    </g>
+  </defs>
+
+  <!-- Lipstick #B80047 · Dark Blue #002D62 · Confetti #DFE966 · Rose #CC1A5E · Slate Blue #4A5D7A -->
+  <g fill="none" stroke-opacity="0.35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- row 1 -->
+    <use xlink:href="#bag"        transform="translate(14 10) rotate(-8 24 24)"     stroke="#B80047" />
+    <use xlink:href="#card"       transform="translate(118 18) rotate(10 24 24)"    stroke="#002D62" />
+    <use xlink:href="#calculator" transform="translate(222 8)"                      stroke="#DFE966" />
+    <use xlink:href="#chart"      transform="translate(318 14) rotate(6 24 24)"     stroke="#4A5D7A" />
+
+    <!-- row 2 -->
+    <use xlink:href="#pencil"     transform="translate(58 108)"                     stroke="#DFE966" />
+    <use xlink:href="#coins"      transform="translate(160 106)"                    stroke="#4A5D7A" />
+    <use xlink:href="#check"      transform="translate(258 112) rotate(-10 24 24)"  stroke="#B80047" />
+    <use xlink:href="#shield"     transform="translate(336 102)"                    stroke="#002D62" />
+
+    <!-- row 3 -->
+    <use xlink:href="#receipt"    transform="translate(10 204) rotate(-10 24 24)"   stroke="#002D62" />
+    <use xlink:href="#bank"       transform="translate(104 196) scale(1.2)"         stroke="#CC1A5E" />
+    <use xlink:href="#padlock"    transform="translate(228 212) rotate(8 24 24)"    stroke="#4A5D7A" />
+    <use xlink:href="#banknote"   transform="translate(312 204) rotate(-12 24 24)"  stroke="#DFE966" />
+
+    <!-- row 4 -->
+    <use xlink:href="#bell"       transform="translate(36 300) rotate(-6 24 24)"    stroke="#4A5D7A" />
+    <use xlink:href="#wallet"     transform="translate(138 306) rotate(6 24 24)"    stroke="#DFE966" />
+    <use xlink:href="#pencil"     transform="translate(236 296) rotate(90 24 24)"   stroke="#002D62" />
+    <use xlink:href="#card"       transform="translate(314 316) rotate(-8 24 24)"   stroke="#CC1A5E" />
+
+    <!-- filler rings -->
+    <circle cx="104" cy="88" r="4" stroke="#B80047" />
+    <circle cx="300" cy="184" r="4" stroke="#002D62" />
+    <circle cx="200" cy="284" r="4" stroke="#CC1A5E" />
+    <circle cx="24" cy="372" r="4" stroke="#4A5D7A" />
+  </g>
+
+  <!-- filler dots -->
+  <g fill-opacity="0.35">
+    <circle cx="208" cy="92" r="2.5" fill="#CC1A5E" />
+    <circle cx="90" cy="184" r="2.5" fill="#DFE966" />
+    <circle cx="300" cy="284" r="2.5" fill="#B80047" />
+    <circle cx="120" cy="380" r="2.5" fill="#002D62" />
+    <circle cx="380" cy="80" r="2.5" fill="#4A5D7A" />
+    <circle cx="380" cy="380" r="2.5" fill="#DFE966" />
+  </g>
+</svg>

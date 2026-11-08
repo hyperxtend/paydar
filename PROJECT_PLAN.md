@@ -1,4 +1,4 @@
-# Ping 'n Pay — Project Plan
+# Paydar — Project Plan
 
 **Status:** Planning
 **Date:** 2026-07-04
@@ -8,7 +8,7 @@
 
 ## Overview
 
-Ping 'n Pay is a bespoke, end-to-end invoice management system with an intelligent notification engine. It enables businesses to create and manage invoices, track payment status, and automatically notify clients when payments are overdue — via email, SMS, and in-app channels.
+Paydar is a bespoke, end-to-end invoice management system with an intelligent notification engine. It enables businesses to create and manage invoices, track payment status, and automatically notify clients when payments are overdue — via email, SMS, and in-app channels.
 
 ---
 

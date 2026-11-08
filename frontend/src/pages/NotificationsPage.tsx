@@ -1,8 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link, useNavigate } from 'react-router-dom'
 import { notificationsApi } from '../api/notifications'
+import { invoicesApi } from '../api/invoices'
+import InvoiceStatusBadge from '../components/InvoiceStatusBadge'
+import Select from '../components/ui/Select'
 import { CHANNEL_LABELS, STATUS_COLOURS } from '../types/notification'
 import type { NotificationChannel, NotificationRecord } from '../types/notification'
+import type { InvoiceStatus, InvoiceSummary } from '../types/invoice'
+import { formatMoney } from '../lib/currency'
 
 const CHANNELS: NotificationChannel[] = ['EMAIL', 'SMS', 'WHATSAPP', 'IN_APP']
 
@@ -28,27 +34,100 @@ function ChannelBadge({ channel }: { channel: NotificationChannel }) {
   )
 }
 
-export default function NotificationsPage() {
+const OUTSTANDING: InvoiceStatus[] = ['OVERDUE', 'PARTIALLY_PAID', 'SENT']
+const PREVIEW_COUNT = 5
+const DAY_MS = 86_400_000
+
+function dueLabel(dueDate: string) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const days = Math.round((new Date(dueDate).setHours(0, 0, 0, 0) - today.getTime()) / DAY_MS)
+  if (days < 0) return { text: `${-days} day${days === -1 ? '' : 's'} overdue`, urgent: true }
+  if (days === 0) return { text: 'Due today', urgent: true }
+  return { text: `Due in ${days} day${days === 1 ? '' : 's'}`, urgent: false }
+}
+
+function ReminderRow({ invoice }: { invoice: InvoiceSummary }) {
   const queryClient = useQueryClient()
-  const [pingChannel, setPingChannel] = useState<Record<string, NotificationChannel>>({})
+  const [channel, setChannel] = useState<NotificationChannel>('EMAIL')
+  const [justSent, setJustSent] = useState(false)
+  const due = dueLabel(invoice.dueDate)
+
+  const { mutate: ping, isPending, isError, reset } = useMutation({
+    mutationFn: () => notificationsApi.ping(invoice.id, channel),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      setJustSent(true)
+    },
+  })
+
+  // Let the "Sent" confirmation linger briefly, then reset the button
+  useEffect(() => {
+    if (!justSent) return
+    const t = setTimeout(() => setJustSent(false), 2500)
+    return () => clearTimeout(t)
+  }, [justSent])
+
+  return (
+    <li className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center">
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <Link to={`/invoices/${invoice.id}`} className="text-sm font-semibold text-gray-900 hover:text-navy-700 hover:underline">
+            {invoice.number}
+          </Link>
+          <InvoiceStatusBadge status={invoice.status} />
+        </div>
+        <p className="text-sm text-gray-600 truncate" title={invoice.clientName}>{invoice.clientName}</p>
+        <p className="text-xs text-gray-500 mt-0.5">
+          {formatMoney(invoice.total, invoice.currency)} ·{' '}
+          <span className={due.urgent ? 'font-medium text-red-600' : ''}>{due.text}</span>
+        </p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Select
+          size="sm"
+          className="w-32"
+          aria-label={`Channel for ${invoice.number}`}
+          value={channel}
+          onChange={(c) => { setChannel(c); reset() }}
+          options={CHANNELS.map((c) => ({ value: c, label: CHANNEL_LABELS[c] }))}
+        />
+        <button
+          type="button"
+          disabled={isPending || justSent}
+          onClick={() => ping()}
+          className={`btn py-1.5 text-xs min-w-[7.5rem] justify-center disabled:cursor-default ${
+            justSent ? 'bg-green-600 text-white' : 'bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-60'
+          }`}
+        >
+          {isPending ? 'Sending…' : justSent ? '✓ Sent' : 'Send reminder'}
+        </button>
+      </div>
+      {isError && <p role="alert" className="text-xs text-red-600 sm:basis-full">Couldn't send, try again.</p>}
+    </li>
+  )
+}
+
+export default function NotificationsPage() {
+  const navigate = useNavigate()
+  const [showAll, setShowAll] = useState(false)
 
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications'],
     queryFn: notificationsApi.list,
   })
 
-  const { mutate: ping, isPending: pinging } = useMutation({
-    mutationFn: ({ invoiceId, channel }: { invoiceId: string; channel: NotificationChannel }) =>
-      notificationsApi.ping(invoiceId, channel),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
+  const { data: allInvoices = [] } = useQuery({
+    queryKey: ['invoices'],
+    queryFn: invoicesApi.list,
   })
 
-  // Deduplicate invoices for the ping controls
-  const invoices = Array.from(
-    new Map(
-      notifications.map((n) => [n.invoiceId, { invoiceId: n.invoiceId, invoiceNumber: n.invoiceNumber, clientName: n.clientName }])
-    ).values()
-  )
+  // Anything still owed, most overdue first
+  const outstanding = allInvoices
+    .filter((inv) => OUTSTANDING.includes(inv.status))
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+  const shown = showAll ? outstanding : outstanding.slice(0, PREVIEW_COUNT)
 
   if (isLoading) {
     return (
@@ -62,52 +141,38 @@ export default function NotificationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Notification History</h1>
+          <h1 className="text-[28px] sm:text-[34px] leading-tight font-bold text-gray-900">Notification History</h1>
           <p className="text-sm text-gray-500 mt-1">All outbound notification activity for your organisation</p>
         </div>
       </div>
 
       {/* Manual ping panel */}
-      {invoices.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h2 className="text-sm font-semibold text-gray-700 mb-3">Manual Ping</h2>
-          <div className="space-y-2">
-            {invoices.slice(0, 5).map((inv) => (
-              <div key={inv.invoiceId} className="flex items-center gap-3 flex-wrap">
-                <span className="text-sm text-gray-700 w-40 truncate">
-                  {inv.invoiceNumber} — {inv.clientName}
-                </span>
-                <select
-                  className="text-xs border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  value={pingChannel[inv.invoiceId] ?? 'EMAIL'}
-                  onChange={(e) =>
-                    setPingChannel((prev) => ({
-                      ...prev,
-                      [inv.invoiceId]: e.target.value as NotificationChannel,
-                    }))
-                  }
-                >
-                  {CHANNELS.map((c) => (
-                    <option key={c} value={c}>{CHANNEL_LABELS[c]}</option>
-                  ))}
-                </select>
-                <button
-                  disabled={pinging}
-                  onClick={() =>
-                    ping({ invoiceId: inv.invoiceId, channel: pingChannel[inv.invoiceId] ?? 'EMAIL' })
-                  }
-                  className="text-xs bg-brand-600 text-white px-3 py-1 rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors"
-                >
-                  Send
-                </button>
-              </div>
-            ))}
+      {outstanding.length > 0 && (
+        <div className="card px-4 pt-4 pb-1">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-base font-semibold text-gray-900">Send a reminder</h2>
+            <span className="text-xs text-gray-500">{outstanding.length} unpaid</span>
           </div>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Nudge a client right now instead of waiting for your notification rules.
+          </p>
+          <ul className="mt-2 divide-y divide-gray-100">
+            {shown.map((inv) => <ReminderRow key={inv.id} invoice={inv} />)}
+          </ul>
+          {outstanding.length > PREVIEW_COUNT && (
+            <button
+              type="button"
+              onClick={() => setShowAll((v) => !v)}
+              className="w-full border-t border-gray-100 py-2.5 text-sm font-medium text-brand-600 hover:text-brand-700 active:scale-100"
+            >
+              {showAll ? 'Show fewer' : `Show all ${outstanding.length}`}
+            </button>
+          )}
         </div>
       )}
 
       {/* Notification log */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="card overflow-hidden">
         {notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-gray-400">
             <svg className="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -130,7 +195,14 @@ export default function NotificationsPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
                 {notifications.map((n) => (
-                  <tr key={n.id} className="hover:bg-gray-50">
+                  <tr
+                    key={n.id}
+                    tabIndex={0}
+                    aria-label={`Open invoice ${n.invoiceNumber}`}
+                    onClick={() => navigate(`/invoices/${n.invoiceId}`)}
+                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/invoices/${n.invoiceId}`)}
+                    className="cursor-pointer hover:bg-navy-50/60 focus-visible:outline-none focus-visible:bg-navy-50 transition-colors"
+                  >
                     <td className="px-4 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">
                       {n.invoiceNumber}
                     </td>

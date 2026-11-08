@@ -1,0 +1,746 @@
+{
+  "info": {
+    "_postman_id": "5fe250ec-833a-46de-a910-1498f23447ac",
+    "name": "Paydar API",
+    "description": "REST API for Paydar — invoicing + overdue payment notifications.\n\nRun \"Auth > Login\" (or \"Auth > Register\" first) to populate {{accessToken}} for the rest of the collection automatically. Requests that create resources (Create Client, Create Invoice, Record Payment, Create Notification Rule) auto-populate the corresponding {{...Id}} variable used by later requests in that folder.\n\nIf the logged-in user has MFA enabled, Login instead populates {{mfaPendingToken}} — run Auth > Verify MFA with a TOTP/backup code to complete login and populate {{accessToken}} as normal.\n\nBase URL defaults to the local dev backend (http://localhost:8080/api) per the project README.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{accessToken}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "refreshToken", "value": "", "type": "string" },
+    { "key": "userId", "value": "", "type": "string" },
+    { "key": "organisationId", "value": "", "type": "string" },
+    { "key": "clientId", "value": "", "type": "string" },
+    { "key": "invoiceId", "value": "", "type": "string" },
+    { "key": "notificationRuleId", "value": "", "type": "string" },
+    { "key": "paymentId", "value": "", "type": "string" },
+    { "key": "mfaPendingToken", "value": "", "type": "string" },
+    { "key": "shareToken", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Ada\",\n  \"lastName\": \"Lovelace\",\n  \"email\": \"ada@example.com\",\n  \"password\": \"changeme123\",\n  \"organisationName\": \"Analytical Engines Ltd\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "register"]
+            },
+            "description": "Registers a new organisation and its first admin user. Returns an access/refresh token pair, same shape as Login."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', data.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', data.refreshToken);",
+                  "    pm.collectionVariables.set('userId', data.user.id);",
+                  "    pm.collectionVariables.set('organisationId', data.user.organisationId);",
+                  "}",
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ada@example.com\",\n  \"password\": \"changeme123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "login"]
+            },
+            "description": "Authenticates with email + password. Run this first — the test script saves the access token into {{accessToken}} for every other request in the collection.\n\nIf the account has MFA enabled, the response instead has mfaRequired=true and no accessToken/user — the test script saves mfaPendingToken instead. Follow up with Auth > Verify MFA to finish logging in."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const data = pm.response.json();",
+                  "    if (data.mfaRequired) {",
+                  "        pm.collectionVariables.set('mfaPendingToken', data.mfaPendingToken);",
+                  "        console.log('MFA required — run Auth > Verify MFA next.');",
+                  "    } else {",
+                  "        pm.collectionVariables.set('accessToken', data.accessToken);",
+                  "        pm.collectionVariables.set('refreshToken', data.refreshToken);",
+                  "        pm.collectionVariables.set('userId', data.user.id);",
+                  "        pm.collectionVariables.set('organisationId', data.user.organisationId);",
+                  "    }",
+                  "}",
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify MFA",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mfaPendingToken\": \"{{mfaPendingToken}}\",\n  \"code\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/mfa-verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "auth", "mfa-verify"]
+            },
+            "description": "Completes login after Login returned mfaRequired=true. code accepts either the current 6-digit TOTP code or one of the 8 single-use backup codes issued at enrolment (backup codes are consumed on use). mfaPendingToken expires after 5 minutes."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const data = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', data.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', data.refreshToken);",
+                  "    pm.collectionVariables.set('userId', data.user.id);",
+                  "    pm.collectionVariables.set('organisationId', data.user.organisationId);",
+                  "}",
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "users", "me"]
+            },
+            "description": "Returns the authenticated user's profile, including role and organisation."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clients",
+      "item": [
+        {
+          "name": "List Clients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/clients",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "clients"]
+            },
+            "description": "Lists all clients belonging to the current user's organisation."
+          }
+        },
+        {
+          "name": "Get Client by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/clients/{{clientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "clients", "{{clientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Client",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Corp\",\n  \"email\": \"billing@acme.test\",\n  \"phone\": \"+44 20 7946 0958\",\n  \"address\": \"1 Acme Way, London, UK\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/clients",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "clients"]
+            },
+            "description": "name and email are required; phone and address are optional."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('clientId', pm.response.json().id);",
+                  "}",
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Client",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Corp\",\n  \"email\": \"billing@acme.test\",\n  \"phone\": \"+44 20 7946 0958\",\n  \"address\": \"2 Acme Way, London, UK\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/clients/{{clientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "clients", "{{clientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Client",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/clients/{{clientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "clients", "{{clientId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "List Invoices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/invoices",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "invoices"]
+            },
+            "description": "Lightweight summary projection (no line items) for the whole org."
+          }
+        },
+        {
+          "name": "Get Invoice by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/invoices/{{invoiceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "invoices", "{{invoiceId}}"]
+            },
+            "description": "Full invoice detail including line items, client, and running balance."
+          }
+        },
+        {
+          "name": "Create Invoice",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": \"{{clientId}}\",\n  \"issueDate\": \"2026-08-14\",\n  \"dueDate\": \"2026-09-13\",\n  \"currency\": \"ZAR\",\n  \"discountAmount\": 0,\n  \"notes\": \"Thanks for your business!\",\n  \"items\": [\n    {\n      \"description\": \"Consulting — August\",\n      \"quantity\": 10,\n      \"unitPrice\": 150.00,\n      \"taxRate\": 20\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/invoices",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "invoices"]
+            },
+            "description": "Creates a new DRAFT invoice. Run Clients > Create Client first (or set {{clientId}} manually) so clientId resolves. At least one line item is required; taxRate is a percentage (20 = 20%) and defaults to 0 if omitted."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('invoiceId', pm.response.json().id);",
+                  "}",
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Invoice",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Updated notes — please pay within 30 days.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/invoices/{{invoiceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "invoices", "{{invoiceId}}"]
+            },
+            "description": "Only DRAFT invoices can be edited. All fields are optional — send only what you want to change; omitted fields are left as-is."
+          }
+        },
+        {
+          "name": "Update Invoice Status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/invoices/{{invoiceId}}/status?status=SENT",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "invoices", "{{invoiceId}}", "status"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "SENT",
+                  "description": "One of DRAFT, SENT, PARTIALLY_PAID, PAID, OVERDUE, VOID. Must be a legal transition from the invoice's current status (e.g. DRAFT -> SENT or VOID; SENT -> PARTIALLY_PAID, PAID, OVERDUE or VOID)."
+                }
+              ]
+            },
+            "description": "Transitions the invoice's lifecycle status. See InvoiceStatus.ALLOWED_TRANSITIONS in the backend for the full state machine."
+          }
+        },
+        {
+          "name": "Delete Invoice",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/invoices/{{invoiceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "invoices", "{{invoiceId}}"]
+            },
+            "description": "Only DRAFT invoices can be deleted."
+          }
+        },
+        {
+          "name": "Download Invoice PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/invoices/{{invoiceId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "invoices", "{{invoiceId}}", "pdf"]
+            },
+            "description": "Streams a generated PDF of the invoice (application/pdf). In Postman, use \"Send and Download\" to save the file rather than viewing the raw response."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "List Payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments"]
+            },
+            "description": "All payments recorded for the current user's organisation."
+          }
+        },
+        {
+          "name": "List Payments by Invoice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments/invoice/{{invoiceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments", "invoice", "{{invoiceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Record Manual Payment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1800.00,\n  \"paymentMethod\": \"BANK_TRANSFER\",\n  \"reference\": \"REF-001\",\n  \"notes\": \"Paid via bank transfer\",\n  \"paidAt\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments/invoice/{{invoiceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments", "invoice", "{{invoiceId}}"]
+            },
+            "description": "paymentMethod is one of BANK_TRANSFER, CARD, CASH, CHEQUE, STRIPE, OTHER. paidAt defaults to now() if null."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('paymentId', pm.response.json().id);",
+                  "}",
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Stripe Checkout Session",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments/invoice/{{invoiceId}}/stripe-checkout",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments", "invoice", "{{invoiceId}}", "stripe-checkout"]
+            },
+            "description": "Requires STRIPE_SECRET_KEY to be configured on the backend. Returns a Stripe-hosted checkout URL."
+          }
+        },
+        {
+          "name": "Stripe Webhook (signature-verified)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              {
+                "key": "Stripe-Signature",
+                "value": "{{stripeSignature}}",
+                "description": "Generate a real value with `stripe listen --forward-to localhost:8080/api/v1/payments/stripe-webhook` and the Stripe CLI — this endpoint verifies the signature against STRIPE_WEBHOOK_SECRET, so a hand-typed value will be rejected."
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_test\",\n  \"type\": \"checkout.session.completed\",\n  \"data\": { \"object\": {} }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments/stripe-webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments", "stripe-webhook"]
+            },
+            "description": "Not for manual testing from Postman — included for completeness. Use the Stripe CLI to forward real signed webhook events instead."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notification Rules",
+      "item": [
+        {
+          "name": "List Notification Rules",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/notification-rules",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "notification-rules"]
+            }
+          }
+        },
+        {
+          "name": "Create Notification Rule",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"3 days before due\",\n  \"triggerDaysOffset\": -3,\n  \"channels\": [\"EMAIL\", \"IN_APP\"],\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/notification-rules",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "notification-rules"]
+            },
+            "description": "triggerDaysOffset is relative to the invoice due date: negative = before due, 0 = on due date, positive = overdue. channels is a non-empty set of EMAIL, SMS, IN_APP, WHATSAPP."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('notificationRuleId', pm.response.json().id);",
+                  "}",
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Notification Rule",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"3 days before due\",\n  \"triggerDaysOffset\": -3,\n  \"channels\": [\"EMAIL\", \"IN_APP\", \"SMS\"],\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/notification-rules/{{notificationRuleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "notification-rules", "{{notificationRuleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Notification Rule",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/notification-rules/{{notificationRuleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "notification-rules", "{{notificationRuleId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "List Notification History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "notifications"]
+            },
+            "description": "Full notification send history (all channels, all invoices) for the org."
+          }
+        },
+        {
+          "name": "List Notification History by Invoice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/notifications/invoice/{{invoiceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "notifications", "invoice", "{{invoiceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Send Manual Ping",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/notifications/invoice/{{invoiceId}}/ping?channel=EMAIL",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "notifications", "invoice", "{{invoiceId}}", "ping"],
+              "query": [
+                {
+                  "key": "channel",
+                  "value": "EMAIL",
+                  "description": "One of EMAIL, SMS, IN_APP, WHATSAPP."
+                }
+              ]
+            },
+            "description": "Fires a one-off notification for this invoice outside the normal rule schedule. Returns 202 Accepted immediately; delivery is async."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Dashboard Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/reports/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "reports", "dashboard"]
+            },
+            "description": "Headline KPIs for the org: totalInvoiced, totalCollected, totalOutstanding, overdueCount/overdueAmount, counts per status, plus a nested aging report. Computed live from invoices/payments — no caching, no query params."
+          }
+        },
+        {
+          "name": "Aging Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/reports/aging",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "reports", "aging"]
+            },
+            "description": "Accounts-receivable aging: balances bucketed into current / 1-30 / 31-60 / 61-90 / 90+ days overdue (by due date vs today), plus a per-invoice rows[] breakdown. Excludes PAID, VOID, and zero-balance invoices."
+          }
+        },
+        {
+          "name": "Export Invoices CSV",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/reports/invoices.csv",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "reports", "invoices.csv"]
+            },
+            "description": "Streams every invoice in the org as text/csv (Content-Disposition: attachment). In Postman, use \"Send and Download\" to save the file rather than viewing the raw response. No query params — always the full org dataset."
+          }
+        }
+      ]
+    },
+    {
+      "name": "MFA",
+      "item": [
+        {
+          "name": "Get MFA Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/mfa/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "mfa", "status"]
+            },
+            "description": "Returns { mfaEnabled: boolean } for the current user."
+          }
+        },
+        {
+          "name": "Begin Enrolment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/mfa/enrol",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "mfa", "enrol"]
+            },
+            "description": "Generates a new TOTP secret for the user (saved but not yet active) and returns { secret, qrCodeBase64, otpAuthUrl }. Scan qrCodeBase64 (a data:image/png;base64 PNG) or otpAuthUrl with an authenticator app, then call Confirm Enrolment with a generated code. MFA is NOT enabled until confirmed."
+          }
+        },
+        {
+          "name": "Confirm Enrolment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": 123456\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/mfa/enrol/confirm",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "mfa", "enrol", "confirm"]
+            },
+            "description": "code is the current 6-digit TOTP from the authenticator app used in Begin Enrolment. On success, enables MFA and returns a List<String> of 8 single-use backup codes — shown once, store them now."
+          }
+        },
+        {
+          "name": "Disable MFA",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": 123456\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/mfa/disable",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "mfa", "disable"]
+            },
+            "description": "code must be a currently-valid TOTP code (backup codes are not accepted here). Clears mfaEnabled/secret/backup codes on success (204 No Content)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Client Portal (Public)",
+      "item": [
+        {
+          "name": "Get Public Invoice",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/public/invoices/{{shareToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "public", "invoices", "{{shareToken}}"]
+            },
+            "description": "Unauthenticated — the UUID share token in the URL IS the credential (invoices.share_token column, set automatically on every invoice). There is currently no authenticated endpoint that surfaces an invoice's share token; fetch it directly from the DB for testing:\n  SELECT share_token FROM invoices WHERE id = '<invoiceId>';\n\nReturns a client-facing view of the invoice (no internal org/user fields). stripeCheckoutUrl is always null for now — Stripe checkout isn't wired up on the portal yet."
+          }
+        },
+        {
+          "name": "Download Public Invoice PDF",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/public/invoices/{{shareToken}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "public", "invoices", "{{shareToken}}", "pdf"]
+            },
+            "description": "Same PDF as the authenticated download, gated only by the share token. Use \"Send and Download\" in Postman to save the file."
+          }
+        }
+      ]
+    }
+  ]
+}

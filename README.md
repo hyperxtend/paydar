@@ -1,8 +1,8 @@
-# 🔔 Ping 'n Pay
+# 🔔 Paydar
 
 *Send the invoice. Ping the client. Get paid.*
 
-Ping 'n Pay is a full-stack invoicing system with a not-so-secret superpower: it **won't let overdue invoices go quietly into the night**. Create clients, raise invoices, and let the notification engine chase payments over email, SMS, WhatsApp and in-app alerts — so you don't have to.
+Paydar is a full-stack invoicing system with a not-so-secret superpower: it **won't let overdue invoices go quietly into the night**. Create clients, raise invoices, and let the notification engine chase payments over email, SMS, WhatsApp and in-app alerts — so you don't have to.
 
 ---
 
@@ -42,15 +42,26 @@ Ping 'n Pay is a full-stack invoicing system with a not-so-secret superpower: it
 - Node 20
 - Docker Desktop
 
+### Quick start
+
+One command starts Postgres + Redis, the API and the frontend (Ctrl+C stops the API and frontend):
+
+```bash
+./dev.sh          # from PowerShell: bash dev.sh
+./dev.sh --seed   # also load the demo data below
+```
+
+Or start each piece yourself:
+
 ### 1. Clone and start the datastores
 
 ```bash
-git clone https://github.com/hyperxtend/ping-n-pay.git
-cd ping-n-pay
+git clone https://github.com/hyperxtend/paydar.git
+cd paydar
 docker compose up -d
 ```
 
-This gives you Postgres on `5432` and Redis on `6379`, both with local defaults (`pingnpay` / `pingnpay`).
+This gives you Postgres on `5432` and Redis on `6379`, both with local defaults (`paydar` / `paydar`).
 
 ### 2. Start the backend
 
@@ -62,6 +73,25 @@ cd backend
 Flyway migrations run automatically on boot. The API comes up at **`http://localhost:8080/api`**.
 
 > **First run?** The app works out of the box — email, SMS, Stripe and MFA are all opt-in. Just register an account and go.
+
+#### Demo data (optional)
+
+Start the backend once with the `seed` profile to load two demo organisations, 8 clients, invoices in every status (with dates relative to today, so the aging buckets are populated), payments, notification rules and notification history:
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=seed
+```
+
+It skips itself if the demo data already exists. To start fresh, run `docker compose down -v && docker compose up -d`. Every account uses the password **`Paydar123!`**:
+
+| Email | Org | Role | Notes |
+|---|---|---|---|
+| `admin@lumen.test` | Lumen Studio (ZAR) | ADMIN | |
+| `finance@lumen.test` | Lumen Studio | FINANCE | |
+| `viewer@lumen.test` | Lumen Studio | VIEWER | |
+| `mfa@lumen.test` | Lumen Studio | ADMIN | MFA on. TOTP secret `JBSWY3DPEHPK3PXP`, backup codes `DEMO0001`–`DEMO0008` |
+| `disabled@lumen.test` | Lumen Studio | FINANCE | Account disabled, so login should be rejected |
+| `owner@northwind.test` | Northwind Traders (ZAR) | ADMIN | Second tenant, for testing data isolation |
 
 ### 3. Start the frontend
 
@@ -140,7 +170,7 @@ All other secrets (`STRIPE_SECRET_KEY`, `TWILIO_*`, etc.) are passed as environm
 
 ```
 backend/
-  src/main/java/com/pingnpay/
+  src/main/java/com/paydar/
     auth/           JWT auth, MFA verify endpoint
     mfa/            TOTP enrolment, verification, backup codes
     domain/         JPA entities — Invoice, Client, Payment, Notification, User

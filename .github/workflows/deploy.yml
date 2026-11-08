@@ -78,7 +78,7 @@ jobs:
           key:      ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
             set -e
-            cd /opt/ping-n-pay
+            cd /opt/paydar
 
             # Pull latest images
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin

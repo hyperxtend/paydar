@@ -15,8 +15,8 @@ RUN mvn package -DskipTests -q
 FROM eclipse-temurin:21-jre-alpine AS runtime
 
 # Non-root user for security
-RUN addgroup -S pingnpay && adduser -S pingnpay -G pingnpay
-USER pingnpay
+RUN addgroup -S paydar && adduser -S paydar -G paydar
+USER paydar
 
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar

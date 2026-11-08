@@ -16,9 +16,9 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_DB: pingnpay_test
-          POSTGRES_USER: pingnpay
-          POSTGRES_PASSWORD: pingnpay
+          POSTGRES_DB: paydar_test
+          POSTGRES_USER: paydar
+          POSTGRES_PASSWORD: paydar
         ports:
           - 5432:5432
         options: >-
@@ -41,9 +41,9 @@ jobs:
         working-directory: backend
         run: mvn -B verify
         env:
-          DB_URL: jdbc:postgresql://localhost:5432/pingnpay_test
-          DB_USERNAME: pingnpay
-          DB_PASSWORD: pingnpay
+          DB_URL: jdbc:postgresql://localhost:5432/paydar_test
+          DB_USERNAME: paydar
+          DB_PASSWORD: paydar
           JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
 
   frontend:

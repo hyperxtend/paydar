@@ -13,13 +13,13 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB:       ${DB_NAME:-pingnpay}
-      POSTGRES_USER:     ${DB_USERNAME:-pingnpay}
+      POSTGRES_DB:       ${DB_NAME:-paydar}
+      POSTGRES_USER:     ${DB_USERNAME:-paydar}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-pingnpay}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-paydar}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -51,15 +51,15 @@ services:
       redis:
         condition: service_healthy
     environment:
-      DB_URL:                   jdbc:postgresql://postgres:5432/${DB_NAME:-pingnpay}
-      DB_USERNAME:              ${DB_USERNAME:-pingnpay}
+      DB_URL:                   jdbc:postgresql://postgres:5432/${DB_NAME:-paydar}
+      DB_USERNAME:              ${DB_USERNAME:-paydar}
       DB_PASSWORD:              ${DB_PASSWORD}
       JWT_SECRET:               ${JWT_SECRET}
       MAIL_HOST:                ${MAIL_HOST:-smtp.sendgrid.net}
       MAIL_PORT:                ${MAIL_PORT:-587}
       MAIL_USERNAME:            ${MAIL_USERNAME:-apikey}
       MAIL_PASSWORD:            ${MAIL_PASSWORD}
-      MAIL_FROM:                ${MAIL_FROM:-noreply@pingnpay.com}
+      MAIL_FROM:                ${MAIL_FROM:-noreply@paydar.com}
       TWILIO_ACCOUNT_SID:       ${TWILIO_ACCOUNT_SID:-}
       TWILIO_AUTH_TOKEN:        ${TWILIO_AUTH_TOKEN:-}
       TWILIO_FROM_NUMBER:       ${TWILIO_FROM_NUMBER:-}

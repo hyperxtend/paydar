@@ -15,6 +15,10 @@ backend/.mvn/wrapper/maven-wrapper.jar
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+*.tsbuildinfo
+# tsc output when vite.config.ts is compiled by mistake
+frontend/vite.config.js
+frontend/vite.config.d.ts
 
 # ── IDEs ─────────────────────────────────────────
 .idea/
