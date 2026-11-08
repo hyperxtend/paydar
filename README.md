@@ -42,6 +42,17 @@ Paydar is a full-stack invoicing system with a not-so-secret superpower: it **wo
 - Node 20
 - Docker Desktop
 
+### Quick start
+
+One command starts Postgres + Redis, the API and the frontend (Ctrl+C stops the API and frontend):
+
+```bash
+./dev.sh          # from PowerShell: bash dev.sh
+./dev.sh --seed   # also load the demo data below
+```
+
+Or start each piece yourself:
+
 ### 1. Clone and start the datastores
 
 ```bash
